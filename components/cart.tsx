@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import Image from "next/image"
-import {AnimatePresence, motion} from "motion/react"
+import { motion, AnimatePresence } from "framer-motion"
 import { X, Minus, Plus, CreditCard, Home, MapPin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,11 +14,11 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
-import { useCartStore } from "@/lib/store"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useCart } from "@/contexts/cart-context"
 
 export default function Cart() {
-  const { items, totalPrice, isOpen, closeCart, removeItem, updateQuantity } = useCartStore()
+  const { items, totalPrice, isOpen, closeCart, removeItem, updateQuantity } = useCart()
   const [step, setStep] = useState<"cart" | "checkout" | "payment">("cart")
   const [deliveryMethod, setDeliveryMethod] = useState("home")
   const [formData, setFormData] = useState({

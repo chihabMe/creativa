@@ -3,13 +3,13 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { motion } from "motion/react"
+import { motion } from "framer-motion"
 import { Minus, Plus, ShoppingCart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { useCartStore } from "@/lib/store"
+import { useCart } from "@/contexts/cart-context"
 import RelatedProducts from "@/components/related-products"
 
 // Sample product data
@@ -46,10 +46,10 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [selectedImage, setSelectedImage] = useState(product.image)
   const { toast } = useToast()
-  const addToCart = useCartStore((state) => state.addItem)
+  const { addItem, openCart } = useCart()
 
   const handleAddToCart = () => {
-    addToCart({
+    addItem({
       id: product.id,
       name: product.name,
       price: product.price,
@@ -63,6 +63,20 @@ export default function ProductPage() {
       title: "Produit ajouté au panier",
       description: `${product.name} a été ajouté à votre panier.`,
     })
+  }
+
+  const handleBuyNow = () => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      quantity,
+      size: selectedSize,
+      frame: selectedFrame,
+      image: product.image,
+    })
+
+    openCart()
   }
 
   const decreaseQuantity = () => {
@@ -186,7 +200,7 @@ export default function ProductPage() {
             </div>
 
             <div className="flex flex-col gap-2 pt-4 sm:flex-row">
-              <Button className="w-full bg-green-600 hover:bg-green-700" size="lg">
+              <Button className="w-full bg-green-600 hover:bg-green-700" size="lg" onClick={handleBuyNow}>
                 J'achète maintenant
               </Button>
               <Button variant="outline" className="w-full" size="lg" onClick={handleAddToCart}>

@@ -1,4 +1,4 @@
-import type { Product } from "./types"
+import type { Product } from "@/components/product-card"
 
 export const products: Product[] = [
   {
@@ -7,6 +7,7 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["islamique", "marron", "grand-tableaux"],
   },
   {
     id: "2",
@@ -14,6 +15,7 @@ export const products: Product[] = [
     price: 3800,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["abstrait", "orange", "marron", "beige"],
   },
   {
     id: "3",
@@ -21,6 +23,7 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["islamique", "dore", "marbre", "grand-tableaux"],
   },
   {
     id: "4",
@@ -28,12 +31,14 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["automne", "moderne", "grand-tableaux"],
   },
   {
     id: "5",
     name: "Botanique rose",
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["botanique", "rose", "grand-tableaux"],
   },
   {
     id: "6",
@@ -41,6 +46,7 @@ export const products: Product[] = [
     price: 3000,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["botanique", "dore", "grand-tableaux"],
   },
   {
     id: "7",
@@ -48,6 +54,7 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["moderne", "minimaliste", "grand-tableaux"],
   },
   {
     id: "8",
@@ -55,6 +62,7 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "TOP VENTE",
+    categories: ["botanique", "beige", "vert", "grand-tableaux"],
   },
   {
     id: "9",
@@ -62,6 +70,7 @@ export const products: Product[] = [
     price: 4800,
     image: "/placeholder.svg?height=400&width=400",
     badge: "TOP VENTE",
+    categories: ["abstrait", "montagne", "beige", "noir", "grand-tableaux"],
   },
   {
     id: "10",
@@ -69,24 +78,28 @@ export const products: Product[] = [
     price: 3800,
     image: "/placeholder.svg?height=400&width=400",
     badge: "TOP VENTE",
+    categories: ["moderne", "minimaliste", "grand-tableaux"],
   },
   {
     id: "11",
     name: "Mandala Marron TOILE",
     price: 3200,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["mandala", "marron", "grand-tableaux"],
   },
   {
     id: "12",
     name: "Plume Bleu",
     price: 4400,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["plume", "bleu", "grand-tableaux"],
   },
   {
     id: "13",
     name: "Botanique marron vert",
     price: 4800,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["botanique", "marron", "vert", "grand-tableaux"],
   },
   {
     id: "14",
@@ -94,17 +107,20 @@ export const products: Product[] = [
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
     badge: "NOUVEAU",
+    categories: ["fleur", "beige", "grand-tableaux"],
   },
   {
     id: "15",
     name: "Marron minimaliste line",
     price: 3900,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["minimaliste", "marron", "grand-tableaux"],
   },
   {
     id: "16",
     name: "Boho Vert",
     price: 4800,
     image: "/placeholder.svg?height=400&width=400",
+    categories: ["boho", "vert", "grand-tableaux"],
   },
 ]

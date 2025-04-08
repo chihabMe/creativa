@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import MobileMenu from "./mobile-menu"
 import Cart from "./cart"
-import { useCartStore } from "@/lib/store"
+import { useCart } from "@/contexts/cart-context"
 
 // Updated navigation items with proper category slugs
 const navItems = [
@@ -53,7 +53,7 @@ const dropdownCategories = [
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
-  const { totalItems, openCart } = useCartStore()
+  const { totalItems, openCart } = useCart()
 
   useEffect(() => {
     const handleScroll = () => {
