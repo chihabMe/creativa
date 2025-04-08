@@ -65,11 +65,8 @@ export default function Header() {
   }, [])
 
   return (
-    <motion.header
+    <header
       className={cn("sticky top-0 z-50 w-full bg-white transition-all duration-200", isScrolled ? "shadow-md" : "")}
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
@@ -170,6 +167,6 @@ export default function Header() {
         </div>
       </div>
       <Cart />
-    </motion.header>
+    </header>
   )
 }
