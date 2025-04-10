@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import ProductDetailsPage from "@/components/product-details-page"
 import RecentlyViewedProducts from "@/components/recently-viewed-products"
 import type { Metadata, ResolvingMetadata } from "next"
+import Header from "@/components/header"
+import Footer from "@/components/footer"
 
 interface ProductPageProps {
   params: {slug:string}
@@ -86,11 +88,15 @@ export default async function ProductPage({ params }: { params: { slug: string }
   const relatedProducts = await getRelatedProducts(product.id, firstCategory, 4)
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
+    <Header/>
+    <main className="container mx-auto px-4 py-8">
       <ProductDetailsPage product={product} relatedProducts={relatedProducts} />
       <div className="mt-16">
         <RecentlyViewedProducts currentProductId={product.id} />
       </div>
-    </div>
+    </main>
+    <Footer/>
+    </>
   )
 }
