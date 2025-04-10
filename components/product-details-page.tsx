@@ -61,7 +61,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
     return 0
   }
 
-  const finalPrice = getSelectedSizePrice() + getSelectedFramePrice()
+  const finalPrice = product.price + getSelectedSizePrice() + getSelectedFramePrice()
 
   const handleAddToCart = () => {
     addItemToCart({

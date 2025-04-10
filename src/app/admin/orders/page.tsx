@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge"
 import { getOrders, updateOrderStatus } from "@/lib/actions/order-actions"
 import { OrderSearch } from "@/components/admin/order-search"
 import { OrderStatusFilter } from "@/components/admin/order-status-filter"
-import { revalidatePath } from "next/cache"
 
 export default async function OrdersPage({
   searchParams,
@@ -43,12 +42,10 @@ export default async function OrdersPage({
   })
 
   const handleUpdateStatus = async (
-    id: number,
+    id: string,
     status: "pending" | "processing" | "shipped" | "delivered" | "cancelled",
   ) => {
-    "use server"
     await updateOrderStatus({ id, status })
-    revalidatePath("/admin/orders")
   }
 
   const getStatusBadge = (status: string) => {
