@@ -1,11 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import ProductCard from "./product-card"
-import { products } from "@/lib/products"
+import { getFeaturedProducts } from "@/lib/data";
 
-export default function ProductGrid() {
+interface ProductGridProps {
+  products: Awaited<ReturnType <typeof getFeaturedProducts>>
+  title?: string
+}
+
+export default function ProductGrid({ products, title = "Nouveauté" }: ProductGridProps) {
   const [visibleProducts, setVisibleProducts] = useState(12)
 
   const loadMore = () => {
@@ -20,9 +25,9 @@ export default function ProductGrid() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        Nouveauté
+        {title}
       </motion.h2>
-      <div className="grid grid-cols-2 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {products.slice(0, visibleProducts).map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}

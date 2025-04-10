@@ -1,36 +1,18 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import ProductCard from "./product-card"
+import type { Product } from "@/lib/types"
 
-const relatedProducts = [
-  {
-    id: "101",
-    name: "Bismillah beige feuille d'or",
-    price: 2500,
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: "102",
-    name: "Minimaliste Moutarde",
-    price: 4800,
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: "103",
-    name: "Flower Gold",
-    price: 3000,
-    image: "/placeholder.svg?height=300&width=300",
-  },
-  {
-    id: "104",
-    name: "Abstrait rosée long",
-    price: 3000,
-    image: "/placeholder.svg?height=300&width=300",
-  },
-]
+interface RelatedProductsProps {
+  products: Product[]
+}
 
-export default function RelatedProducts() {
+export default function RelatedProducts({ products }: RelatedProductsProps) {
+  if (products.length === 0) {
+    return null
+  }
+
   return (
     <section className="mt-16">
       <motion.h2
@@ -42,7 +24,7 @@ export default function RelatedProducts() {
         Vous pourriez aussi aimer
       </motion.h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
-        {relatedProducts.map((product, index) => (
+        {products.map((product, index) => (
           <ProductCard key={product.id} product={product} index={index} />
         ))}
       </div>

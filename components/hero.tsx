@@ -1,23 +1,18 @@
 "use client"
 
 import Image from "next/image"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 
 export default function Hero() {
   return (
     <section className="relative w-full">
-      <motion.div
-        className="absolute left-0 top-0 z-10 w-full bg-gradient-to-b from-black/20 to-transparent py-2 text-center text-white"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
-      >
-        <p className="inline-block text-sm bg-red-400 rounded-md py-1 px-3">Sublimez votre intérieur avec nos magnifiques tableaux ✨</p>
-      </motion.div>
+      <div className="absolute left-0 top-0 z-10 w-full bg-gradient-to-b from-black/20 to-transparent py-2 text-center text-white">
+        <p className="text-sm">Sublimez votre intérieur avec nos magnifiques tableaux ✨</p>
+      </div>
 
       <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[500px]">
         {/* Background image */}
-        <Image src="/images/hero.png" alt="Creativa Deco Store Front" fill priority className="object-cover" />
+        <Image src="/images/banner-1.jpg" alt="Creativa Deco Store Front" fill priority className="object-cover" />
 
         {/* Gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>

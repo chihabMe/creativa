@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
-import { Search, ShoppingCart } from "lucide-react"
+import { motion } from "motion/react"
+import { Search, ShoppingCart, Heart } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import MobileMenu from "./mobile-menu"
@@ -65,8 +65,11 @@ export default function Header() {
   }, [])
 
   return (
-    <header
+    <motion.header
       className={cn("sticky top-0 z-50 w-full bg-white transition-all duration-200", isScrolled ? "shadow-md" : "")}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
@@ -150,8 +153,15 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" aria-label="Search">
-            <Search className="h-5 w-5" />
+          <Button variant="ghost" size="icon" aria-label="Search" asChild>
+            <Link href="/search">
+              <Search className="h-5 w-5" />
+            </Link>
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Favoris" asChild>
+            <Link href="/wishlist">
+              <Heart className="h-5 w-5" />
+            </Link>
           </Button>
           <Button variant="ghost" size="icon" aria-label="Cart" onClick={openCart}>
             <div className="relative">
@@ -167,6 +177,6 @@ export default function Header() {
         </div>
       </div>
       <Cart />
-    </header>
+    </motion.header>
   )
 }

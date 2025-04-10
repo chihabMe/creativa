@@ -4,8 +4,9 @@ import type React from "react"
 
 import { useState } from "react"
 import Image from "next/image"
-import { motion, AnimatePresence } from "framer-motion"
-import { X, Minus, Plus, CreditCard, Home, MapPin } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { motion, AnimatePresence } from "motion/react"
+import { X, Minus, Plus, CreditCard, Home, MapPin, Loader2, CheckCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -15,12 +16,71 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/contexts/cart-context"
+import { createOrder } from "@/lib/actions/order-actions"
+
+// Wilaya options for Algeria
+const wilayaOptions = [
+  { value: "1", label: "1 - Adrar" },
+  { value: "2", label: "2 - Chlef" },
+  { value: "3", label: "3 - Laghouat" },
+  { value: "4", label: "4 - Oum El Bouaghi" },
+  { value: "5", label: "5 - Batna" },
+  { value: "6", label: "6 - Béjaïa" },
+  { value: "7", label: "7 - Biskra" },
+  { value: "8", label: "8 - Béchar" },
+  { value: "9", label: "9 - Blida" },
+  { value: "10", label: "10 - Bouira" },
+  { value: "11", label: "11 - Tamanrasset" },
+  { value: "12", label: "12 - Tébessa" },
+  { value: "13", label: "13 - Tlemcen" },
+  { value: "14", label: "14 - Tiaret" },
+  { value: "15", label: "15 - Tizi Ouzou" },
+  { value: "16", label: "16 - Alger" },
+  { value: "17", label: "17 - Djelfa" },
+  { value: "18", label: "18 - Jijel" },
+  { value: "19", label: "19 - Sétif" },
+  { value: "20", label: "20 - Saïda" },
+  { value: "21", label: "21 - Skikda" },
+  { value: "22", label: "22 - Sidi Bel Abbès" },
+  { value: "23", label: "23 - Annaba" },
+  { value: "24", label: "24 - Guelma" },
+  { value: "25", label: "25 - Constantine" },
+  { value: "26", label: "26 - Médéa" },
+  { value: "27", label: "27 - Mostaganem" },
+  { value: "28", label: "28 - M'Sila" },
+  { value: "29", label: "29 - Mascara" },
+  { value: "30", label: "30 - Ouargla" },
+  { value: "31", label: "31 - Oran" },
+  { value: "32", label: "32 - El Bayadh" },
+  { value: "33", label: "33 - Illizi" },
+  { value: "34", label: "34 - Bordj Bou Arreridj" },
+  { value: "35", label: "35 - Boumerdès" },
+  { value: "36", label: "36 - El Tarf" },
+  { value: "37", label: "37 - Tindouf" },
+  { value: "38", label: "38 - Tissemsilt" },
+  { value: "39", label: "39 - El Oued" },
+  { value: "40", label: "40 - Khenchela" },
+  { value: "41", label: "41 - Souk Ahras" },
+  { value: "42", label: "42 - Tipaza" },
+  { value: "43", label: "43 - Mila" },
+  { value: "44", label: "44 - Aïn Defla" },
+  { value: "45", label: "45 - Naâma" },
+  { value: "46", label: "46 - Aïn Témouchent" },
+  { value: "47", label: "47 - Ghardaïa" },
+  { value: "48", label: "48 - Relizane" },
+]
 
 export default function Cart() {
-  const { items, totalPrice, isOpen, closeCart, removeItem, updateQuantity } = useCart()
-  const [step, setStep] = useState<"cart" | "checkout" | "payment">("cart")
+  const router = useRouter()
+  const { toast } = useToast()
+  const { items, totalPrice, isOpen, closeCart, removeItem, updateQuantity, clearCart } = useCart()
+  const [step, setStep] = useState<"cart" | "checkout" | "payment" | "success">("cart")
   const [deliveryMethod, setDeliveryMethod] = useState("home")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [orderNumber, setOrderNumber] = useState<string | null>(null)
+
   const [formData, setFormData] = useState({
     phone: "",
     name: "",
@@ -33,17 +93,46 @@ export default function Cart() {
     acceptTerms: false,
   })
 
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error when field is edited
+    if (formErrors[name]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
   }
 
   const handleCheckboxChange = (checked: boolean) => {
     setFormData((prev) => ({ ...prev, acceptTerms: checked }))
+
+    // Clear error when field is edited
+    if (formErrors.acceptTerms) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors.acceptTerms
+        return newErrors
+      })
+    }
   }
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error when field is edited
+    if (formErrors[name]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
   }
 
   const handleQuantityChange = (id: string, newQuantity: number) => {
@@ -52,11 +141,37 @@ export default function Cart() {
     }
   }
 
+  const validateCheckoutForm = () => {
+    const errors: Record<string, string> = {}
+
+    if (!formData.name.trim()) errors.name = "Le nom est requis"
+    if (!formData.phone.trim()) errors.phone = "Le numéro de téléphone est requis"
+    if (!formData.email.trim()) errors.email = "L'email est requis"
+    else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = "Format d'email invalide"
+    if (!formData.wilaya) errors.wilaya = "La wilaya est requise"
+    if (!formData.commune.trim()) errors.commune = "La commune est requise"
+    if (!formData.address.trim()) errors.address = "L'adresse est requise"
+
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const validatePaymentForm = () => {
+    const errors: Record<string, string> = {}
+
+    if (!formData.acceptTerms) errors.acceptTerms = "Vous devez accepter les conditions générales"
+
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleContinue = () => {
     if (step === "cart") {
       setStep("checkout")
     } else if (step === "checkout") {
-      setStep("payment")
+      if (validateCheckoutForm()) {
+        setStep("payment")
+      }
     }
   }
 
@@ -69,6 +184,82 @@ export default function Cart() {
   }
 
   const handleClose = () => {
+    closeCart()
+    setStep("cart")
+    // Don't reset form data to preserve it for the next time
+  }
+
+  const handleSubmitOrder = async () => {
+    if (!validatePaymentForm()) return
+
+    setIsSubmitting(true)
+
+    try {
+      // Prepare order data
+      const orderData = {
+        customerName: formData.name,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        shippingAddress: {
+          address: formData.address,
+          city: formData.commune,
+          state: formData.wilaya,
+          postalCode: "",
+        },
+        items: items,
+        total: totalPrice,
+        paymentMethod: "cash",
+        notes: formData.note,
+      }
+
+      // Submit order
+      const result = await createOrder(orderData)
+
+      if (result.success) {
+        // Store order number for success page
+        setOrderNumber(result.orderNumber || null)
+
+        // Clear cart
+        clearCart()
+
+        // Show success message
+        toast({
+          title: "Commande réussie",
+          description: "Votre commande a été enregistrée avec succès.",
+        })
+
+        // Move to success step
+        setStep("success")
+      } else {
+        toast({
+          title: "Erreur",
+          description: result.message || "Une erreur est survenue lors de la création de la commande.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error submitting order:", error)
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la création de la commande.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleViewOrder = () => {
+    // Close the cart
+    closeCart()
+
+    // Redirect to order details page
+    if (orderNumber) {
+      router.push(`/orders/${orderNumber}`)
+    }
+  }
+
+  const handleContinueShopping = () => {
     closeCart()
     setStep("cart")
   }
@@ -88,10 +279,11 @@ export default function Cart() {
                 {step === "cart" && "Panier"}
                 {step === "checkout" && "Informations & Expédition"}
                 {step === "payment" && "Paiement"}
+                {step === "success" && "Commande confirmée"}
               </SheetTitle>
-              {/* <Button variant="ghost" size="icon" onClick={handleClose}>
+              <Button variant="ghost" size="icon" onClick={handleClose}>
                 <X className="h-4 w-4" />
-              </Button> */}
+              </Button>
             </div>
           </SheetHeader>
 
@@ -194,27 +386,37 @@ export default function Cart() {
                 >
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="phone">Numéro de téléphone</Label>
+                      <Label htmlFor="phone" className="mb-1 block">
+                        Numéro de téléphone
+                      </Label>
                       <Input
                         id="phone"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
                         placeholder="Numéro de téléphone"
+                        className={formErrors.phone ? "border-red-500" : ""}
                       />
+                      {formErrors.phone && <p className="mt-1 text-xs text-red-500">{formErrors.phone}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="name">Nom</Label>
+                      <Label htmlFor="name" className="mb-1 block">
+                        Nom
+                      </Label>
                       <Input
                         id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleInputChange}
                         placeholder="Nom"
+                        className={formErrors.name ? "border-red-500" : ""}
                       />
+                      {formErrors.name && <p className="mt-1 text-xs text-red-500">{formErrors.name}</p>}
                     </div>
                     <div>
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email" className="mb-1 block">
+                        Email
+                      </Label>
                       <Input
                         id="email"
                         name="email"
@@ -222,49 +424,57 @@ export default function Cart() {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="Email"
+                        className={formErrors.email ? "border-red-500" : ""}
                       />
+                      {formErrors.email && <p className="mt-1 text-xs text-red-500">{formErrors.email}</p>}
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="wilaya">Wilaya</Label>
+                        <Label htmlFor="wilaya" className="mb-1 block">
+                          Wilaya
+                        </Label>
                         <Select value={formData.wilaya} onValueChange={(value) => handleSelectChange("wilaya", value)}>
-                          <SelectTrigger id="wilaya">
+                          <SelectTrigger id="wilaya" className={formErrors.wilaya ? "border-red-500" : ""}>
                             <SelectValue placeholder="Sélectionner" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="1">1 - Adrar</SelectItem>
-                            <SelectItem value="2">2 - Chlef</SelectItem>
-                            <SelectItem value="16">16 - Alger</SelectItem>
-                            <SelectItem value="31">31 - Oran</SelectItem>
+                            {wilayaOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
+                        {formErrors.wilaya && <p className="mt-1 text-xs text-red-500">{formErrors.wilaya}</p>}
                       </div>
                       <div>
-                        <Label htmlFor="commune">Commune</Label>
-                        <Select
+                        <Label htmlFor="commune" className="mb-1 block">
+                          Commune
+                        </Label>
+                        <Input
+                          id="commune"
+                          name="commune"
                           value={formData.commune}
-                          onValueChange={(value) => handleSelectChange("commune", value)}
-                        >
-                          <SelectTrigger id="commune">
-                            <SelectValue placeholder="Sélectionner" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="benaria">Benaria</SelectItem>
-                            <SelectItem value="kouba">Kouba</SelectItem>
-                            <SelectItem value="hydra">Hydra</SelectItem>
-                          </SelectContent>
-                        </Select>
+                          onChange={handleInputChange}
+                          placeholder="Commune"
+                          className={formErrors.commune ? "border-red-500" : ""}
+                        />
+                        {formErrors.commune && <p className="mt-1 text-xs text-red-500">{formErrors.commune}</p>}
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="address">Adresse</Label>
+                      <Label htmlFor="address" className="mb-1 block">
+                        Adresse
+                      </Label>
                       <Input
                         id="address"
                         name="address"
                         value={formData.address}
                         onChange={handleInputChange}
                         placeholder="Adresse"
+                        className={formErrors.address ? "border-red-500" : ""}
                       />
+                      {formErrors.address && <p className="mt-1 text-xs text-red-500">{formErrors.address}</p>}
                     </div>
                   </div>
 
@@ -299,7 +509,9 @@ export default function Cart() {
                   </div>
 
                   <div>
-                    <Label htmlFor="note">Note</Label>
+                    <Label htmlFor="note" className="mb-1 block">
+                      Note
+                    </Label>
                     <Textarea
                       id="note"
                       name="note"
@@ -330,7 +542,7 @@ export default function Cart() {
                           className="flex justify-between border-b pb-2"
                         >
                           <div>
-                            <p className="text-sm font-medium">{item.name}</p>
+                            <p className="font-medium">{item.name}</p>
                             <p className="text-xs text-gray-500">
                               {item.size} / {item.frame}
                             </p>
@@ -368,7 +580,7 @@ export default function Cart() {
                         <RadioGroupItem value="cash" id="cash" />
                         <Label htmlFor="cash" className="flex items-center gap-2">
                           <CreditCard className="h-5 w-5" />
-                          Cash
+                          Paiement à la livraison
                         </Label>
                       </div>
                     </RadioGroup>
@@ -394,13 +606,55 @@ export default function Cart() {
                   </div>
 
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="terms" checked={formData.acceptTerms} onCheckedChange={handleCheckboxChange} />
+                    <Checkbox
+                      id="terms"
+                      checked={formData.acceptTerms}
+                      onCheckedChange={handleCheckboxChange}
+                      className={formErrors.acceptTerms ? "border-red-500" : ""}
+                    />
                     <Label htmlFor="terms" className="text-sm">
                       J'ai lu et j'accepte les{" "}
                       <a href="#" className="text-blue-600 underline">
                         conditions générales
                       </a>
                     </Label>
+                  </div>
+                  {formErrors.acceptTerms && <p className="mt-1 text-xs text-red-500">{formErrors.acceptTerms}</p>}
+                </motion.div>
+              )}
+
+              {step === "success" && (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="flex flex-col items-center justify-center space-y-6 p-6 text-center"
+                >
+                  <div className="rounded-full bg-green-100 p-4">
+                    <CheckCircle className="h-12 w-12 text-green-600" />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold">Commande confirmée !</h3>
+                    <p className="text-gray-600">
+                      Merci pour votre commande. Nous vous contacterons bientôt pour confirmer la livraison.
+                    </p>
+                    {orderNumber && (
+                      <p className="font-medium">
+                        Numéro de commande: <span className="font-bold">{orderNumber}</span>
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex w-full flex-col gap-2 pt-4 sm:flex-row">
+                    <Button variant="outline" className="flex-1" onClick={handleContinueShopping}>
+                      Continuer vos achats
+                    </Button>
+                    {orderNumber && (
+                      <Button className="flex-1" onClick={handleViewOrder}>
+                        Voir ma commande
+                      </Button>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -409,18 +663,35 @@ export default function Cart() {
 
           <div className="border-t p-6">
             <div className="flex gap-4">
-              {step !== "cart" && (
+              {step !== "cart" && step !== "success" && (
                 <Button variant="outline" className="flex-1" onClick={handleBack}>
                   Retour
                 </Button>
               )}
-              {step === "payment" ? (
-                <Button className="flex-1 bg-green-600 hover:bg-green-700" disabled={!formData.acceptTerms}>
-                  J'ACHÈTE MAINTENANT
-                </Button>
-              ) : (
+              {step === "cart" && (
                 <Button className="flex-1" onClick={handleContinue} disabled={items.length === 0}>
                   Continuer
+                </Button>
+              )}
+              {step === "checkout" && (
+                <Button className="flex-1" onClick={handleContinue}>
+                  Continuer
+                </Button>
+              )}
+              {step === "payment" && (
+                <Button
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  onClick={handleSubmitOrder}
+                  disabled={isSubmitting || !formData.acceptTerms}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Traitement...
+                    </>
+                  ) : (
+                    "J'ACHÈTE MAINTENANT"
+                  )}
                 </Button>
               )}
             </div>

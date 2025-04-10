@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Menu  } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
@@ -25,9 +25,9 @@ export default function MobileMenu({ items }: MobileMenuProps) {
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b pb-4">
             <span className="text-lg font-semibold">Menu</span>
-            {/* <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+            <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
               <X className="h-5 w-5" />
-            </Button> */}
+            </Button>
           </div>
           <nav className="flex-1 overflow-auto py-6">
             <ul className="flex flex-col gap-4">
