@@ -57,7 +57,7 @@ const dropdownCategories = [
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { totalItems, openCart } = useCart();
+  // const { totalItems, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,7 +71,7 @@ export default function Header() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 w-full bg-white transition-all duration-200",
+        "sticky top-0 z-50 w-full bg-white  transition-all duration-200",
         isScrolled ? "shadow-md" : ""
       )}
     >
