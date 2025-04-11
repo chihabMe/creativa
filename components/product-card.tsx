@@ -27,41 +27,41 @@ export default function ProductCard({ product, index }: ProductCardProps) {
   const isInCart = !!cartItem
   const [showQuantity, setShowQuantity] = useState(false)
 
-  const handleAddToCart = () => {
-    if (!isInCart) {
-      addItem({
-        id: product.id.toString(),
-        name: product.name,
-        price: product.price,
-        quantity: 1,
-        size: product.sizes && product.sizes.length > 0 ? product.sizes[0].size : "1M×50CM", // Default size
-        frame: product.frames && product.frames.length > 0 ? product.frames[0].frame : "SANS", // Default frame
-        image: product.images?.[0] || "/placeholder.svg",
-      })
+  // const handleAddToCart = () => {
+  //   if (!isInCart) {
+  //     addItem({
+  //       id: product.id.toString(),
+  //       name: product.name,
+  //       price: product.price,
+  //       quantity: 1,
+  //       size: product.sizes && product.sizes.length > 0 ? product.sizes[0].size : "1M×50CM", // Default size
+  //       frame: product.frames && product.frames.length > 0 ? product.frames[0].frame : "SANS", // Default frame
+  //       image: product.images?.[0] || "/placeholder.svg",
+  //     })
 
-      toast({
-        title: "Produit ajouté au panier",
-        description: `${product.name} a été ajouté à votre panier.`,
-      })
-    } else {
-      setShowQuantity(true)
-    }
-  }
+  //     toast({
+  //       title: "Produit ajouté au panier",
+  //       description: `${product.name} a été ajouté à votre panier.`,
+  //     })
+  //   } else {
+  //     setShowQuantity(true)
+  //   }
+  // }
 
-  const increaseQuantity = () => {
-    if (cartItem) {
-      updateQuantity(cartItem.id, cartItem.quantity + 1)
-    }
-  }
+  // const increaseQuantity = () => {
+  //   if (cartItem) {
+  //     updateQuantity(cartItem.id, cartItem.quantity + 1)
+  //   }
+  // }
 
-  const decreaseQuantity = () => {
-    if (cartItem && cartItem.quantity > 1) {
-      updateQuantity(cartItem.id, cartItem.quantity - 1)
-    } else if (cartItem) {
-      removeItem(cartItem.id)
-      setShowQuantity(false)
-    }
-  }
+  // const decreaseQuantity = () => {
+  //   if (cartItem && cartItem.quantity > 1) {
+  //     updateQuantity(cartItem.id, cartItem.quantity - 1)
+  //   } else if (cartItem) {
+  //     removeItem(cartItem.id)
+  //     setShowQuantity(false)
+  //   }
+  // }
 
   // Map badge enum to display text
   const getBadgeText = (badge: string) => {
@@ -120,11 +120,11 @@ export default function ProductCard({ product, index }: ProductCardProps) {
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex items-center justify-between p-4 pt-0">
-          <span className="font-semibold">{product.price} DA</span>
+        <CardFooter className="flex items-center   justify-between p-4 pt-0">
+          <span className="font-semibold md:text-lg">{product.price} DA</span>
 
           <div className="flex items-center gap-2">
-            {showQuantity || isInCart ? (
+            {/* {showQuantity || isInCart ? (
               <div className="flex items-center">
                 <Button size="icon" variant="outline" className="h-8 w-8 rounded-full" onClick={decreaseQuantity}>
                   <Minus className="h-3 w-3" />
@@ -145,7 +145,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
                 <ShoppingCart className="mr-2 h-4 w-4" />
                 {product.stock > 0 ? "Ajouter" : "Indisponible"}
               </Button>
-            )}
+            )} */}
             <WishlistButton productId={product.id} productName={product.name} variant="ghost" className="h-8 w-8" />
           </div>
         </CardFooter>

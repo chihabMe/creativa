@@ -1,12 +1,12 @@
 import Link from "next/link"
 import { Facebook, Instagram, Twitter } from "lucide-react"
-import NewsletterForm from "@/components/newsletter-form"
+// import NewsletterForm from "@/components/newsletter-form"
 
 export default function Footer() {
   return (
     <footer className="bg-black text-white">
       <div className="container mx-auto px-4 py-12">
-        <div className="mb-12 border-b border-gray-800 pb-12">
+        {/* <div className="mb-12 border-b border-gray-800 pb-12">
           <div className="mx-auto max-w-3xl text-center">
             <h3 className="mb-4 text-xl font-semibold">Inscrivez-vous à notre newsletter</h3>
             <p className="mb-6 text-gray-300">
@@ -16,7 +16,7 @@ export default function Footer() {
               <NewsletterForm />
             </div>
           </div>
-        </div>
+        </div> */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <h3 className="mb-4 text-lg font-semibold">À propos de CREATIVA DÉCO</h3>

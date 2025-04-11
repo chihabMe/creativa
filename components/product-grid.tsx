@@ -6,7 +6,7 @@ import ProductCard from "./product-card"
 import { getFeaturedProducts } from "@/lib/data";
 
 interface ProductGridProps {
-  products: Awaited<ReturnType <typeof getFeaturedProducts>>
+  products: Awaited<ReturnType<typeof getFeaturedProducts>>
   title?: string
 }
 
@@ -15,6 +15,11 @@ export default function ProductGrid({ products, title = "Nouveauté" }: ProductG
 
   const loadMore = () => {
     setVisibleProducts((prev) => prev + 8)
+  }
+
+  const productVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
   }
 
   return (
@@ -28,8 +33,18 @@ export default function ProductGrid({ products, title = "Nouveauté" }: ProductG
         {title}
       </motion.h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+
         {products.slice(0, visibleProducts).map((product, index) => (
-          <ProductCard key={product.id} product={product} index={index} />
+          <motion.div
+            key={product.id}
+            variants={productVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.4, delay: index * 0.1 }}
+          >
+            <ProductCard product={product} index={index} />
+          </motion.div>
         ))}
       </div>
       {visibleProducts < products.length && (

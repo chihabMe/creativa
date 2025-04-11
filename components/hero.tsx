@@ -6,9 +6,9 @@ import { motion } from "motion/react"
 export default function Hero() {
   return (
     <section className="relative w-full">
-      <div className="absolute left-0 top-0 z-10 w-full bg-gradient-to-b from-black/20 to-transparent py-2 text-center text-white">
+      {/* <div className="absolute left-0 top-0 z-10 w-full bg-gradient-to-b from-black/20 to-transparent py-2 text-center text-white">
         <p className="text-sm">Sublimez votre intérieur avec nos magnifiques tableaux ✨</p>
-      </div>
+      </div> */}
 
       <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[500px]">
         {/* Background image */}
@@ -24,8 +24,40 @@ export default function Hero() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.8 }}
       >
-        <h1 className="text-3xl font-bold text-white md:text-5xl">CreativaDeco</h1>
-        <p className="mt-2 text-lg text-white md:text-xl">Décorez votre intérieur avec style</p>
+        <motion.h1
+          className="text-3xl font-bold text-white md:text-5xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          {Array.from("CreativaDeco").map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 + index * 0.05, duration: 0.3 }}
+            >
+              {char}
+            </motion.span>
+          ))}
+        </motion.h1>
+        <motion.p
+          className="mt-2 text-lg text-white md:text-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+        >
+          {Array.from("Décorez votre intérieur avec style").map((char, index) => (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.5 + index * 0.03, duration: 0.3 }}
+            >
+              {char}
+            </motion.span>
+          ))}
+        </motion.p>
       </motion.div>
     </section>
   )
