@@ -76,7 +76,8 @@ export default function Header() {
       )}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-8">
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.svg"
@@ -86,7 +87,7 @@ export default function Header() {
               priority
             />
           </Link>
-          <nav className="hidden md:flex">
+          <nav className="flex">
             <ul className="flex items-center gap-6">
               {navItems.map((item) => (
                 <motion.li
@@ -167,7 +168,9 @@ export default function Header() {
             </ul>
           </nav>
         </div>
-        <div className="flex items-center gap-4">
+
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-4">
           <Button variant="ghost" size="icon" aria-label="Search" asChild>
             <Link href="/search">
               <Search className="h-5 w-5" />
@@ -178,11 +181,32 @@ export default function Header() {
               <Heart className="h-5 w-5" />
             </Link>
           </Button>
-
           <Cart />
+        </div>
 
-          <div className="md:hidden">
-            <MobileMenu items={navItems} />
+        {/* Mobile Layout */}
+        <div className="flex w-full items-center justify-between md:hidden">
+          {/* Mobile Menu Trigger on Left */}
+          <div>
+            <MobileMenu items={navItems} includeSearch={true} />
+          </div>
+          
+          {/* Logo in Center */}
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/logo.svg"
+                alt="Creativa Deco"
+                width={100}
+                height={35}
+                priority
+              />
+            </Link>
+          </div>
+          
+          {/* Cart on Right */}
+          <div>
+            <Cart />
           </div>
         </div>
       </div>
