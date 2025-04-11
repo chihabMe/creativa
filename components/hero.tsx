@@ -12,7 +12,7 @@ export default function Hero() {
 
       <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[500px]">
         {/* Background image */}
-        <Image src="/images/banner-1.jpg" alt="Creativa Deco Store Front" fill priority className="object-cover" />
+        <Image src="/images/hero.png" alt="Creativa Deco Store Front" fill priority className="object-cover" />
 
         {/* Gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>

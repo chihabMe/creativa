@@ -215,9 +215,9 @@ export default function Cart() {
       // Submit order
       const result = await createOrder(orderData)
 
-      if (result.success) {
+      if (result?.data?.success) {
         // Store order number for success page
-        setOrderNumber(result.orderNumber || null)
+        setOrderNumber(result.data.orderNumber || null)
 
         // Clear cart
         clearCart()
@@ -233,7 +233,7 @@ export default function Cart() {
       } else {
         toast({
           title: "Erreur",
-          description: result.message || "Une erreur est survenue lors de la création de la commande.",
+          description: result?.data?.message || "Une erreur est survenue lors de la création de la commande.",
           variant: "destructive",
         })
       }

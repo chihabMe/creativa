@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const ids = idsParam.split(",").map((id) => Number.parseInt(id, 10))
+    const ids = idsParam.split(",")
     const products = await getProductsByIds(ids)
 
     return NextResponse.json(products)

@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache"
 import { db } from "@/lib/db"
 import { products } from "@/lib/db/schema"
-import { eq, like, desc, sql } from "drizzle-orm"
+import { eq, like, desc, sql, inArray } from "drizzle-orm"
 
 // Cache tags for different types of data
 export const CACHE_TAGS = {
@@ -185,12 +185,12 @@ export const getAllCategories = unstable_cache(
 
 // Get products by IDs with caching
 export const getProductsByIds = unstable_cache(
-  async (ids: number[]) => {
+  async (ids: string[]) => {
     try {
       if (ids.length === 0) return []
 
       return await db.query.products.findMany({
-        where: sql`${products.id} IN (${ids.join(",")})`,
+        where: inArray(products.id,ids)
       })
     } catch (error) {
       console.error(`Error fetching products by IDs:`, error)
