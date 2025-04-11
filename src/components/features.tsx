@@ -1,7 +1,6 @@
-"use client"
 
-import { motion } from "motion/react"
 import { Package, UserCheck, Truck, HeadphonesIcon } from "lucide-react"
+import * as motion from "motion/react-m"
 
 const features = [
   {

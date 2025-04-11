@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { motion } from "motion/react"
+import * as motion from "motion/react-m"
 
 export default function Hero() {
   return (

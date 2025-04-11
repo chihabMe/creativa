@@ -1,24 +1,28 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { motion } from "motion/react"
-import { Search, ShoppingCart, Heart } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import MobileMenu from "./mobile-menu"
-import Cart from "./cart"
-import { useCart } from "@/contexts/cart-context"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import * as motion from "motion/react-m";
+import { Search, ShoppingCart, Heart } from "lucide-react";
+import { cn } from "@/lib/utils";
+import MobileMenu from "./mobile-menu";
+import Cart from "./cart";
+import { Button } from "@/components/ui/button";
+import { useCart } from "@/contexts/cart-context";
 
 // Updated navigation items with proper category slugs
 const navItems = [
   { name: "TOUS LES MODÈLES (Trois-Duo )", href: "#", isDropdown: true },
-  { name: "GRAND TABLEAUX", href: "/category/grand-tableaux", isDropdown: false },
+  {
+    name: "GRAND TABLEAUX",
+    href: "/category/grand-tableaux",
+    isDropdown: false,
+  },
   { name: "VASES", href: "/category/vases", isDropdown: false },
   { name: "MIROIRS", href: "/category/miroirs", isDropdown: false },
   { name: "BOUGIES", href: "/category/bougies", isDropdown: false },
-]
+];
 
 // Categories for the dropdown
 const dropdownCategories = [
@@ -49,29 +53,38 @@ const dropdownCategories = [
       { name: "Bohème", href: "/category/boheme" },
     ],
   },
-]
+];
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const { totalItems, openCart } = useCart()
+  const [isScrolled, setIsScrolled] = useState(false);
+  const { totalItems, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10)
-    }
+      setIsScrolled(window.scrollY > 10);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <header
-      className={cn("sticky top-0 z-50 w-full bg-white transition-all duration-200", isScrolled ? "shadow-md" : "")}
+      className={cn(
+        "sticky top-0 z-50 w-full bg-white transition-all duration-200",
+        isScrolled ? "shadow-md" : ""
+      )}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Creativa Deco" width={120} height={40} priority />
+            <Image
+              src="/logo.svg"
+              alt="Creativa Deco"
+              width={120}
+              height={40}
+              priority
+            />
           </Link>
           <nav className="hidden md:flex">
             <ul className="flex items-center gap-6">
@@ -108,7 +121,9 @@ export default function Header() {
                       <div className="grid w-full grid-cols-4 gap-8">
                         {dropdownCategories.map((category, index) => (
                           <div key={index}>
-                            <h3 className="mb-3 border-b pb-2 text-lg font-semibold">{category.title}</h3>
+                            <h3 className="mb-3 border-b pb-2 text-lg font-semibold">
+                              {category.title}
+                            </h3>
                             <ul className="space-y-2">
                               {category.items.map((subItem, subIndex) => (
                                 <li key={subIndex}>
@@ -126,8 +141,12 @@ export default function Header() {
 
                         <div className="flex flex-col justify-between">
                           <div>
-                            <h3 className="mb-3 border-b pb-2 text-lg font-semibold">Offre spéciale</h3>
-                            <p className="mb-2 text-sm text-gray-600">Découvrez notre collection exclusive</p>
+                            <h3 className="mb-3 border-b pb-2 text-lg font-semibold">
+                              Offre spéciale
+                            </h3>
+                            <p className="mb-2 text-sm text-gray-600">
+                              Découvrez notre collection exclusive
+                            </p>
                             <Link
                               href="/category/exclusives"
                               className="inline-block rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-black/80"
@@ -137,7 +156,8 @@ export default function Header() {
                           </div>
                           <div className="mt-4 rounded-md bg-gray-100 p-3">
                             <p className="text-xs font-medium text-gray-800">
-                              Livraison gratuite pour toute commande supérieure à 10 000 DA
+                              Livraison gratuite pour toute commande supérieure
+                              à 10 000 DA
                             </p>
                           </div>
                         </div>
@@ -160,20 +180,14 @@ export default function Header() {
               <Heart className="h-5 w-5" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="Cart" onClick={openCart}>
-            <div className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                {totalItems}
-              </span>
-            </div>
-          </Button>
+
+          <Cart />
+
           <div className="md:hidden">
             <MobileMenu items={navItems} />
           </div>
         </div>
       </div>
-      <Cart />
     </header>
-  )
+  );
 }

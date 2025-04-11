@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "motion/react"
+import * as motion from "motion/react-m"
 import ProductCard from "./product-card"
 import type { Product } from "@/lib/types"
 

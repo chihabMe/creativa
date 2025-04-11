@@ -1,4 +1,4 @@
-import { getProductById, getProductBySlug, getRelatedProducts } from "@/lib/data"
+import {  getProductBySlug, getRelatedProducts } from "@/lib/data"
 import { notFound } from "next/navigation"
 import ProductDetailsPage from "@/components/product-details-page"
 import RecentlyViewedProducts from "@/components/recently-viewed-products"
