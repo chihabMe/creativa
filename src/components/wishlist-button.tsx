@@ -57,7 +57,7 @@ export default function WishlistButton({
       >
         <Heart
           className={cn(
-            "h-5 w-5 transition-colors duration-200",
+            "h-6 w-6 transition-colors duration-200",
             inWishlist ? "fill-red-500 text-red-500" : "text-muted-foreground"
           )}
         />
