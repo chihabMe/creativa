@@ -86,7 +86,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -5 }}
     >
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden flex flex-col h-full">
         <div className="relative">
           <Link href={`/products/${product.slug}`}>
             <div className="relative aspect-square overflow-hidden">
@@ -108,7 +108,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
             </div>
           )}
         </div>
-        <CardContent className="p-4">
+        <CardContent className="p-4 flex-grow">
           <Link href={`/products/${product.slug}`}>
             <h3 className="mb-1 text-center text-sm font-medium">{product.name}</h3>
           </Link>

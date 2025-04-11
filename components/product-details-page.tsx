@@ -104,29 +104,6 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
     setQuantity(quantity + 1)
   }
 
-  const generateJsonLd = (product: Product) => {
-    const jsonLd = {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      name: product.name,
-      image: product.images.map((img) => img),
-      description: product.description || `${product.name} - Décoration d'intérieur par CRÉATIVA DÉCO`,
-      brand: {
-        "@type": "Brand",
-        name: "CRÉATIVA DÉCO",
-      },
-      offers: {
-        "@type": "Offer",
-        url: `https://creativadeco.com/products/${product.id}`,
-        priceCurrency: "DZD",
-        price: product.price,
-        availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-        itemCondition: "https://schema.org/NewCondition",
-      },
-    }
-
-    return JSON.stringify(jsonLd)
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -206,17 +183,17 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                   onValueChange={setSelectedSize}
                   className="grid grid-cols-2 gap-2 sm:grid-cols-4"
                 >
-                  {product.sizes.map((size) => (
+                    {product.sizes.map((size) => (
                     <div key={size.size} className="flex items-center space-x-2">
                       <RadioGroupItem value={size.size} id={`size-${size.size}`} className="peer sr-only" />
                       <Label
-                        htmlFor={`size-${size.size}`}
-                        className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-black peer-data-[state=checked]:bg-black peer-data-[state=checked]:text-white"
+                      htmlFor={`size-${size.size}`}
+                      className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-500 peer-data-[state=checked]:text-white"
                       >
-                        {size.size}
+                      {size.size}
                       </Label>
                     </div>
-                  ))}
+                    ))}
                 </RadioGroup>
               </div>
             )}
@@ -234,7 +211,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                   <RadioGroupItem value={frame.frame} id={`frame-${frame.frame}`} className="peer sr-only" />
                   <Label
                   htmlFor={`frame-${frame.frame}`}
-                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-black peer-data-[state=checked]:bg-black peer-data-[state=checked]:text-white"
+                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-500 peer-data-[state=checked]:text-white"
                   >
                   {frame.frame}
                   </Label>
@@ -296,9 +273,9 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
 
           <div className="pt-4">
             <SocialShare
-              url={`https://creativadeco.com/products/${product.id}`}
+              url={`https://creativadeco.com/products/${product.slug}`}
               title={product.name}
-              description={product.description || undefined}
+              // description={product.description || undefined}
             />
           </div>
         </div>

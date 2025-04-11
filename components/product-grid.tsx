@@ -18,7 +18,7 @@ export default function ProductGrid({ products, title = "Nouveauté" }: ProductG
   }
 
   return (
-    <section className="container mx-auto py-16">
+    <section className="container mx-auto px-4 md:px-0 py-16">
       <motion.h2
         className="mb-12 text-center text-3xl font-bold"
         initial={{ opacity: 0, y: 20 }}

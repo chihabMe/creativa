@@ -1,16 +1,15 @@
-"use client"
-
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
+import { useIsHydrated } from "@/hooks/use-is-hydrated"
 
 interface WishlistButtonProps {
   productId: string;
-  productName: string
-  className?: string
-  variant?: "default" | "outline" | "ghost"
+  productName: string;
+  className?: string;
+  variant?: "default" | "outline" | "ghost";
 }
 
 export default function WishlistButton({
@@ -21,8 +20,9 @@ export default function WishlistButton({
 }: WishlistButtonProps) {
   const { addItem, removeItem, isInWishlist } = useWishlistStore()
   const { toast } = useToast()
+  const hydrated = useIsHydrated()
 
-  const inWishlist = isInWishlist(productId)
+  const inWishlist = hydrated ? isInWishlist(productId) : false
 
   const toggleWishlist = () => {
     if (inWishlist) {
@@ -48,7 +48,12 @@ export default function WishlistButton({
       className={cn(className)}
       aria-label={inWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
     >
-      <Heart className={cn("h-5 w-5", inWishlist ? "fill-red-500 text-red-500" : "")} />
+      <Heart
+        className={cn(
+          "h-5 w-5 transition-colors duration-200",
+          inWishlist ? "fill-red-500 text-red-500" : "text-muted-foreground"
+        )}
+      />
     </Button>
   )
 }
