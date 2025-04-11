@@ -1,27 +1,21 @@
-"use client"
-
-import { useState } from "react"
-import { motion } from "motion/react"
-import ProductCard from "./product-card"
+import ProductCard from "./product-card";
 import { getFeaturedProducts } from "@/lib/data";
+import * as motion from "motion/react-m";
+import Link from "next/link";
 
 interface ProductGridProps {
-  products: Awaited<ReturnType<typeof getFeaturedProducts>>
-  title?: string
+  products: Awaited<ReturnType<typeof getFeaturedProducts>>;
+  title?: string;
 }
 
-export default function ProductGrid({ products, title = "Nouveauté" }: ProductGridProps) {
-  const [visibleProducts, setVisibleProducts] = useState(12)
-
-  const loadMore = () => {
-    setVisibleProducts((prev) => prev + 8)
-  }
-
-  const productVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  }
-
+const productVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+};
+export default function ProductGrid({
+  products,
+  title = "Nouveauté",
+}: ProductGridProps) {
   return (
     <section className="container mx-auto px-4 md:px-0 py-16">
       <motion.h2
@@ -33,8 +27,7 @@ export default function ProductGrid({ products, title = "Nouveauté" }: ProductG
         {title}
       </motion.h2>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-
-        {products.slice(0, visibleProducts).map((product, index) => (
+        {products.map((product, index) => (
           <motion.div
             key={product.id}
             variants={productVariants}
@@ -47,18 +40,18 @@ export default function ProductGrid({ products, title = "Nouveauté" }: ProductG
           </motion.div>
         ))}
       </div>
-      {visibleProducts < products.length && (
-        <div className="mt-12 flex justify-center">
+
+      <div className="mt-12 flex justify-center">
+        <Link href={"/search"}>
           <motion.button
             className="rounded-md bg-black px-6 py-2 text-white transition-colors hover:bg-black/80"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={loadMore}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.97 }}
           >
             Voir plus
           </motion.button>
-        </div>
-      )}
+        </Link>
+      </div>
     </section>
-  )
+  );
 }

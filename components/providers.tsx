@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import React, { ReactNode } from "react";
 import { Session } from "next-auth";
 import { ThemeProvider } from "@/components/theme-provider";
+import { LazyMotion, domAnimation } from "motion/react";
 
 interface ProvidersProps {
   children: ReactNode;
@@ -13,10 +14,11 @@ interface ProvidersProps {
 const Providers = ({ children, session }: ProvidersProps) => {
   return (
     <SessionProvider session={session}>
-
-      <ThemeProvider attribute="class" defaultTheme="light">
-        <CartProvider>{children}</CartProvider>
-      </ThemeProvider>
+      <LazyMotion features={domAnimation}>
+        <ThemeProvider attribute="class" defaultTheme="light">
+          <CartProvider>{children}</CartProvider>
+        </ThemeProvider>
+      </LazyMotion>
     </SessionProvider>
   );
 };

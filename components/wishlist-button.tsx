@@ -1,10 +1,11 @@
+"use client";
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { useIsHydrated } from "@/hooks/use-is-hydrated"
-import {motion} from "motion/react"
+import * as motion from "motion/react-m"
 
 interface WishlistButtonProps {
   productId: string;

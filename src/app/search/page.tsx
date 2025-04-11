@@ -26,7 +26,7 @@ export default async function SearchPage({
   return (
     <>
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container min-h-screen mx-auto px-4 py-8">
         <h1 className="mb-6 text-2xl font-bold">Recherche</h1>
 
         <div className="mb-8">
