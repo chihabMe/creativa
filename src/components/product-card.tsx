@@ -19,13 +19,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index }: ProductCardProps) {
-  const { toast } = useToast()
-  const { items, addItem, updateQuantity, removeItem } = useCart()
+  // const { toast } = useToast()
+  const { items} = useCart()
 
   // Find if product is already in cart
   const cartItem = items.find((item) => item.id === product.id.toString())
-  const isInCart = !!cartItem
-  const [showQuantity, setShowQuantity] = useState(false)
+  // const isInCart = !!cartItem
+  // const [showQuantity, setShowQuantity] = useState(false)
 
   // const handleAddToCart = () => {
   //   if (!isInCart) {
@@ -110,7 +110,12 @@ export default function ProductCard({ product, index }: ProductCardProps) {
         </div>
         <CardContent className="p-4 flex-grow">
           <Link href={`/products/${product.slug}`}>
-            <h3 className="mb-1 text-center text-sm font-medium">{product.name}</h3>
+            <h3 
+              className="mb-1 text-center text-sm font-medium h-4 md:h-12 overflow-hidden text-ellipsis whitespace-nowrap" 
+              title={product.name}
+            >
+              {product.name.length > 30 ? `${product.name.slice(0, 30)}...` : product.name}
+            </h3>
           </Link>
           {product.stock <= 0 && (
             <div className="mt-1 text-center">
