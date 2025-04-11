@@ -5,9 +5,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import ProductGrid from "@/components/product-grid"
 import { useWishlistStore } from "@/lib/store/wishlist-store"
-import { getProductsByIds } from "@/lib/data"
+import {  getProductsByIds } from "@/lib/data"
 
-type Product= Awaited<ReturnType<typeof getProductsByIds>>
+type Product= Awaited<ReturnType<typeof getProductsByIds>>[0]
 
 export default function WishlistClient() {
   const { items } = useWishlistStore()
