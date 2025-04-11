@@ -281,9 +281,9 @@ export default function Cart() {
                 {step === "payment" && "Paiement"}
                 {step === "success" && "Commande confirmée"}
               </SheetTitle>
-              <Button variant="ghost" size="icon" onClick={handleClose}>
+              {/* <Button variant="ghost" size="icon" onClick={handleClose}>
                 <X className="h-4 w-4" />
-              </Button>
+              </Button> */}
             </div>
           </SheetHeader>
 

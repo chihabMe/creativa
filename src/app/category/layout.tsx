@@ -6,9 +6,11 @@ export default function CategoryLayout({
 }: {
   children: React.ReactNode;
 }) {
-  <>
-    <Header />
-    <main className="min-h-screen bg-white">{children}</main>
-    <Footer />
-  </>;
+  return (
+    <>
+      <Header />
+      <main className="min-h-screen bg-white">{children}</main>
+      <Footer />
+    </>
+  );
 }
