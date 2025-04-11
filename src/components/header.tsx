@@ -92,8 +92,6 @@ export default function Header() {
                 <motion.li
                   key={item.name}
                   className={item.isDropdown ? "relative group" : ""}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
                 >
                   <Link
                     href={item.href}
