@@ -13,10 +13,9 @@ interface ProvidersProps {
 const Providers = ({ children, session }: ProvidersProps) => {
   return (
     <SessionProvider session={session}>
+
       <ThemeProvider attribute="class" defaultTheme="light">
-          <CartProvider>
-        {children}
-          </CartProvider>
+        <CartProvider>{children}</CartProvider>
       </ThemeProvider>
     </SessionProvider>
   );

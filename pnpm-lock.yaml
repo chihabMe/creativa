@@ -152,6 +152,9 @@ importers:
       next-auth:
         specifier: latest
         version: 4.24.11(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next-nprogress-bar:
+        specifier: ^2.4.7
+        version: 2.4.7
       next-safe-action:
         specifier: latest
         version: 7.10.5(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.24.2)
@@ -2208,6 +2211,9 @@ packages:
       nodemailer:
         optional: true
 
+  next-nprogress-bar@2.4.7:
+    resolution: {integrity: sha512-OeveNQYFBhQhZ+RgrDnvHNUEQfHCmipymmD4AfAVE9pFV4jeWi7/nNK5f0lIk7ODRrtjyyr/n2YpkRbs5kUoMg==}
+
   next-safe-action@7.10.5:
     resolution: {integrity: sha512-UQdu490byYN7034FYZtnPVFP3DjyvYBpmXSQ/dpdJFznSsGCDCmTRk+Hs51emt5jljEKtMcL1XCfBbFuGklmrA==}
     engines: {node: '>=18.17'}
@@ -2283,6 +2289,9 @@ packages:
   npmlog@5.0.1:
     resolution: {integrity: sha512-AqZtDUWOMKs1G/8lwylVjrdYgqA4d9nu8hc+0gzRxlDb1I10+FHBGMXs6aiQHFdCUUlqH99MUMuLfzWDNDtfxw==}
     deprecated: This package is no longer supported.
+
+  nprogress-v2@1.1.10:
+    resolution: {integrity: sha512-MypWLNIPIM07SS0bAc/oac0vhVFz9vAHm7d1sj//Pnf3J03LQ3CuWrlDteIu6exq0fIvkDJ6tUDRWLaifsIt5w==}
 
   oauth@0.9.15:
     resolution: {integrity: sha512-a5ERWK1kh38ExDEfoO6qUHJb32rd7aYmPHuyCu3Fta/cnICvYmgd2uhuKXvPD+PXB+gCEYYEaQdIRAjCOwAKNA==}
@@ -4345,6 +4354,10 @@ snapshots:
       react-dom: 19.1.0(react@19.1.0)
       uuid: 8.3.2
 
+  next-nprogress-bar@2.4.7:
+    dependencies:
+      nprogress-v2: 1.1.10
+
   next-safe-action@7.10.5(next@15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(zod@3.24.2):
     dependencies:
       next: 15.2.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -4403,6 +4416,8 @@ snapshots:
       console-control-strings: 1.1.0
       gauge: 3.0.2
       set-blocking: 2.0.0
+
+  nprogress-v2@1.1.10: {}
 
   oauth@0.9.15: {}
 

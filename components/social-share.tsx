@@ -49,7 +49,7 @@ export default function SocialShare({ url, title  }: SocialShareProps) {
       <Button
         variant="outline"
         size="icon"
-        className="h-8 w-8 rounded-full bg-blue-600 text-white hover:bg-blue-700"
+        className="h-8 w-8 border-none rounded-full bg-blue-600 text-white hover:bg-blue-700"
         onClick={() => handleShare("facebook", facebookUrl)}
       >
         <Facebook className="h-4 w-4" />

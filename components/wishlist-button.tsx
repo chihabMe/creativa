@@ -4,6 +4,7 @@ import { useWishlistStore } from "@/lib/store/wishlist-store"
 import { useToast } from "@/components/ui/use-toast"
 import { cn } from "@/lib/utils"
 import { useIsHydrated } from "@/hooks/use-is-hydrated"
+import {motion} from "motion/react"
 
 interface WishlistButtonProps {
   productId: string;
@@ -41,19 +42,25 @@ export default function WishlistButton({
   }
 
   return (
-    <Button
-      variant={variant}
-      size="icon"
-      onClick={toggleWishlist}
-      className={cn(className)}
-      aria-label={inWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+    <motion.div
+      whileTap={{ scale: 0.9 }}
+      whileHover={{ scale: 1.1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
     >
-      <Heart
-        className={cn(
-          "h-5 w-5 transition-colors duration-200",
-          inWishlist ? "fill-red-500 text-red-500" : "text-muted-foreground"
-        )}
-      />
-    </Button>
+      <Button
+        variant={variant}
+        size="icon"
+        onClick={toggleWishlist}
+        className={cn(className)}
+        aria-label={inWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+      >
+        <Heart
+          className={cn(
+            "h-5 w-5 transition-colors duration-200",
+            inWishlist ? "fill-red-500 text-red-500" : "text-muted-foreground"
+          )}
+        />
+      </Button>
+    </motion.div>
   )
 }

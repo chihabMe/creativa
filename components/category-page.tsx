@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion } from "motion/react"
 import { Filter, ChevronDown, Grid3X3, Grid2X2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import ProductCard from "@/components/product-card"
-import type { Product } from "@/lib/types"
 import Breadcrumb from "@/components/breadcrumb"
+import { getProductsByCategory } from "@/lib/data"
 
 // Category name mapping for display purposes
 const categoryDisplayNames: Record<string, string> = {
@@ -32,10 +32,12 @@ const categoryDisplayNames: Record<string, string> = {
   "meilleures-ventes": "MEILLEURES VENTES",
   exclusives: "EXCLUSIVES",
 }
+type Product = Awaited<ReturnType<typeof getProductsByCategory>>[0]
 
 interface CategoryPageProps {
   category: string
   initialProducts: Product[]
+
 }
 
 export default function CategoryPage({ category, initialProducts }: CategoryPageProps) {

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { auth } from "@/lib/auth";
 import Providers from "@/components/providers";
+// import RouteProgressBar from "@/components/route-progress-bar";
 
 // const inter = Inter({ subsets: ["latin"] })
 
@@ -17,7 +18,6 @@ export default async function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <body>
         <Providers session={session} >
-
             {children}
             <Toaster />
         </Providers>

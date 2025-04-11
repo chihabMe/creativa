@@ -1,8 +1,14 @@
-import type React from "react"
+import Footer from "@/components/footer";
+import Header from "@/components/header";
+import type React from "react";
 export default function CategoryLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  return <section className="min-h-screen bg-white">{children}</section>
+  <>
+    <Header />
+    <main className="min-h-screen bg-white">{children}</main>
+    <Footer />
+  </>;
 }
