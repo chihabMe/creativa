@@ -1,7 +1,7 @@
 import { unstable_cache } from "next/cache"
 import { db } from "@/lib/db"
-import { products } from "@/lib/db/schema"
-import { eq, like, desc, sql, inArray } from "drizzle-orm"
+import { orders, products, users } from "@/lib/db/schema"
+import { eq, like, desc, sql, inArray, sum, gte, count, lt, and } from "drizzle-orm"
 
 // Cache tags for different types of data
 export const CACHE_TAGS = {
@@ -73,7 +73,7 @@ export const getProductsByCategory = unstable_cache(
 
 // Get product by ID with caching
 export const getProductById = unstable_cache(
-  async (id: number) => {
+  async (id: string) => {
     try {
       return await db.query.products.findFirst({
         where: eq(products.id, id),
@@ -202,4 +202,259 @@ export const getProductsByIds = unstable_cache(
     tags: [CACHE_TAGS.products],
     revalidate: 3600, // Revalidate every hour
   },
+)
+
+
+// Cache tags for dashboard data
+export const DASHBOARD_CACHE_TAGS = {
+  dashboardStats: "dashboard-stats",
+  recentOrders: "recent-orders",
+  lowStockProducts: "low-stock-products",
+  salesAnalytics: "sales-analytics"
+}
+
+// Get dashboard overview statistics
+export const getDashboardStats = unstable_cache(
+  async () => {
+    try {
+      // Total sales (sum of all order totals)
+      const salesResult = await db
+        .select({ totalSales: sum(orders.total) })
+        .from(orders)
+      
+      // Total orders count
+      const ordersResult = await db
+        .select({ count: count() })
+        .from(orders)
+      
+      // Total products count
+      const productsResult = await db
+        .select({ count: count() })
+        .from(products)
+      
+      // Total customers (users with role "user")
+      const customersResult = await db
+        .select({ count: count() })
+        .from(users)
+        .where(eq(users.role, "user"))
+
+      // Get month-over-month growth for sales
+      const currentDate = new Date()
+      const firstDayCurrentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
+      const firstDayLastMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+      const firstDayTwoMonthsAgo = new Date(currentDate.getFullYear(), currentDate.getMonth() - 2, 1)
+
+      // Current month sales
+      const currentMonthSales = await db
+        .select({ total: sum(orders.total) })
+        .from(orders)
+        .where(gte(orders.createdAt, firstDayCurrentMonth))
+
+      // Previous month sales
+      const previousMonthSales = await db
+        .select({ total: sum(orders.total) })
+        .from(orders)
+        .where(
+          and(
+            gte(orders.createdAt, firstDayLastMonth),
+            lt(orders.createdAt, firstDayCurrentMonth)
+          )
+        )
+
+      // Calculate growth percentages
+      const salesGrowth = calculateGrowthPercentage(
+        (parseFloat(previousMonthSales[0].total ?? "0") || 0),
+        parseFloat(currentMonthSales[0].total ?? "0") || 0
+      )
+
+      // Similar queries for orders, products, and customers growth
+      const currentMonthOrders = await db
+        .select({ count: count() })
+        .from(orders)
+        .where(gte(orders.createdAt, firstDayCurrentMonth))
+
+      const previousMonthOrders = await db
+        .select({ count: count() })
+        .from(orders)
+        .where(
+          and(
+            gte(orders.createdAt, firstDayLastMonth),
+            lt(orders.createdAt, firstDayCurrentMonth)
+          )
+        )
+
+      const ordersGrowth = calculateGrowthPercentage(
+        previousMonthOrders[0].count || 0,
+        currentMonthOrders[0].count || 0
+      )
+
+      // New products added this month
+      const newProductsThisMonth = await db
+        .select({ count: count() })
+        .from(products)
+        .where(gte(products.createdAt, firstDayCurrentMonth))
+
+      const productsGrowth = (newProductsThisMonth[0].count || 0) / (productsResult[0].count || 1) * 100
+
+      // Customer growth
+      const currentMonthCustomers = await db
+        .select({ count: count() })
+        .from(users)
+        .where(
+          and(
+            eq(users.role, "user"),
+            gte(users.createdAt, firstDayCurrentMonth)
+          )
+        )
+
+      const previousMonthCustomers = await db
+        .select({ count: count() })
+        .from(users)
+        .where(
+          and(
+            eq(users.role, "user"),
+            gte(users.createdAt, firstDayLastMonth),
+            lt(users.createdAt, firstDayCurrentMonth)
+          )
+        )
+
+      const customersGrowth = calculateGrowthPercentage(
+        previousMonthCustomers[0].count || 0,
+        currentMonthCustomers[0].count || 0
+      )
+
+      return {
+        totalSales: salesResult[0].totalSales || 0,
+        totalOrders: ordersResult[0].count || 0,
+        totalProducts: productsResult[0].count || 0,
+        totalCustomers: customersResult[0].count || 0,
+        salesGrowth,
+        ordersGrowth,
+        productsGrowth,
+        customersGrowth
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error)
+      return {
+        totalSales: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        totalCustomers: 0,
+        salesGrowth: 0,
+        ordersGrowth: 0,
+        productsGrowth: 0,
+        customersGrowth: 0
+      }
+    }
+  },
+  ["dashboard-stats"],
+  {
+    tags: [DASHBOARD_CACHE_TAGS.dashboardStats],
+    revalidate: 3600, // Revalidate every hour
+  }
+)
+
+// Helper function to calculate growth percentage
+function calculateGrowthPercentage(previous: number, current: number): number {
+  if (previous === 0) return current > 0 ? 100 : 0
+  return ((current - previous) / previous) * 100
+}
+
+// Get recent orders with customer information
+export const getRecentOrders = unstable_cache(
+  async (limit = 5) => {
+    try {
+      return await db.query.orders.findMany({
+        orderBy: [desc(orders.createdAt)],
+        limit,
+        with: {
+          user: true
+        }
+      })
+    } catch (error) {
+      console.error("Error fetching recent orders:", error)
+      return []
+    }
+  },
+  ["recent-orders"],
+  {
+    tags: [DASHBOARD_CACHE_TAGS.recentOrders],
+    revalidate: 1800, // Revalidate every 30 minutes
+  }
+)
+
+// Get low stock products
+export const getLowStockProducts = unstable_cache(
+  async (threshold = 5, limit = 10) => {
+    try {
+      return await db.query.products.findMany({
+        where: lt(products.stock, threshold),
+        orderBy: [products.stock],
+        limit
+      })
+    } catch (error) {
+      console.error("Error fetching low stock products:", error)
+      return []
+    }
+  },
+  ["low-stock-products"],
+  {
+    tags: [DASHBOARD_CACHE_TAGS.lowStockProducts],
+    revalidate: 3600, // Revalidate every hour
+  }
+)
+
+// Get sales analytics by time period
+export const getSalesAnalytics = unstable_cache(
+  async (period: "daily" | "weekly" | "monthly" = "monthly", limit = 6) => {
+    try {
+      let timeFormat: string
+      let periodLabel: string
+      
+      // Set SQL date format based on period
+      switch (period) {
+        case "daily":
+          timeFormat = "YYYY-MM-DD"
+          periodLabel = "day"
+          break
+        case "weekly":
+          timeFormat = "YYYY-WW" // ISO week
+          periodLabel = "week"
+          break
+        case "monthly":
+        default:
+          timeFormat = "YYYY-MM"
+          periodLabel = "month"
+          break
+      }
+
+      const result = await db.execute(sql`
+        SELECT 
+          TO_CHAR(created_at, ${timeFormat}) as time_period,
+          SUM(total) as revenue,
+          COUNT(*) as orders
+        FROM 
+          orders
+        GROUP BY 
+          time_period
+        ORDER BY 
+          time_period DESC
+        LIMIT ${limit}
+      `)
+
+      return result.map((row: any) => ({
+        period: row.time_period,
+        revenue: parseInt(row.revenue) || 0,
+        orders: parseInt(row.orders) || 0
+      }))
+    } catch (error) {
+      console.error("Error fetching sales analytics:", error)
+      return []
+    }
+  },
+  ["sales-analytics"],
+  {
+    tags: [DASHBOARD_CACHE_TAGS.salesAnalytics],
+    revalidate: 3600, // Revalidate every hour
+  }
 )
