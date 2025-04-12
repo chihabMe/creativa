@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm"
 import { nanoid } from "nanoid"
 import { CACHE_TAGS } from "../data";
 
+// Schema for deleting an order
 // Schema for creating a new order
 const createOrderSchema = z.object({
   customerName: z.string().min(1, "Le nom est requis"),
@@ -112,6 +113,8 @@ export const updateOrderStatus = adminAction.schema(updateOrderStatusSchema).act
 
     revalidateTag(CACHE_TAGS.orders)
     revalidatePath("/admin/orders")
+    revalidatePath(`/admin/orders/${parsedInput.id}`)
+
 
     return { success: true, message: "Statut de la commande mis à jour avec succès" }
   } catch (error) {
@@ -176,3 +179,87 @@ export async function getOrderByNumber(orderNumber: string) {
     return null
   }
 }
+
+// Delete an order
+const deleteOrderSchema = z.object({
+  id: z.string(),
+})
+export const deleteOrder = adminAction.schema(deleteOrderSchema).action(async ({ parsedInput: { id } }) => {
+  try {
+    // First delete all order items
+    await db.delete(orderItems).where(eq(orderItems.orderId, id))
+
+    // Then delete the order
+    await db.delete(orders).where(eq(orders.id, id))
+
+    revalidateTag(CACHE_TAGS.orders)
+    revalidatePath("/admin/orders")
+
+    return { success: true, message: "Commande supprimée avec succès" }
+  } catch (error) {
+    console.error("Error deleting order:", error)
+    return { success: false, message: "Erreur lors de la suppression de la commande" }
+  }
+})
+
+// Get all orders with pagination (for admin use)
+const getOrdersWithPaginationSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).default(10),
+  status: z.string().default("all"),
+  query: z.string().default(""),
+});
+
+export const getOrdersWithPagination = adminAction.schema(getOrdersWithPaginationSchema).action(async ({ parsedInput: { page = 1, limit = 10, status = "all", query = "" } }) => {
+  try {
+    const offset = (page - 1) * limit
+
+    // Get all orders first (we'll filter in JS for simplicity)
+    const allOrders = await db.query.orders.findMany({
+      orderBy: (orders, { desc }) => [desc(orders.createdAt)],
+      with: {
+        orderItems: {
+          with: {
+            product: true,
+          },
+        },
+      },
+    })
+
+    // Filter orders based on search query and status
+    const filteredOrders = allOrders.filter((order) => {
+      const matchesQuery =
+        !query ||
+        order.orderNumber.toLowerCase().includes(query.toLowerCase()) ||
+        order.customerName.toLowerCase().includes(query.toLowerCase()) ||
+        order.customerEmail.toLowerCase().includes(query.toLowerCase())
+
+      const matchesStatus = status === "all" || order.status === status
+
+      return matchesQuery && matchesStatus
+    })
+
+    // Get total count for pagination
+    const totalCount = filteredOrders.length
+
+    // Paginate the filtered orders
+    const paginatedOrders = filteredOrders.slice(offset, offset + limit)
+
+    return {
+      success: true,
+      orders: paginatedOrders,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    }
+  } catch (error) {
+    console.error("Error fetching orders:", error)
+    return {
+      success: false,
+      orders: [],
+      totalCount: 0,
+      totalPages: 0,
+      currentPage: page,
+    }
+  }
+})
