@@ -224,7 +224,7 @@ export const searchProducts = unstable_cache(
 
 // Get related products with caching
 export const getRelatedProducts = unstable_cache(
-  async (productId: number, categorySlug: string, limit = 4) => {
+  async (productId: string, categorySlug: string, limit = 4) => {
     try {
       // First, find the category ID from the slug
       const category = await db.query.categories.findFirst({

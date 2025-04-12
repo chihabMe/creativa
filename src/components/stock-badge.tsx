@@ -26,7 +26,7 @@ export default function StockBadge({ stock, lowStockThreshold = 5 }: StockBadgeP
   }
 
   return (
-    <Badge variant="outline" className="flex items-center gap-1 border-green-500 bg-green-100 text-green-800">
+    <Badge variant="outline" className="flex items-center gap-1 border-emerald-500 bg-emerald-100 text-emerald-800">
       <CheckCircle className="h-3 w-3" />
       En stock
     </Badge>

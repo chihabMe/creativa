@@ -70,7 +70,7 @@ export default function ContactPageClient() {
 
             <div className="space-y-4">
               <div className="flex items-start">
-                <MapPin className="mr-3 h-5 w-5 text-pink-500" />
+                <MapPin className="mr-3 h-5 w-5 text-emerald-500" />
                 <div>
                   <h3 className="font-medium">Adresse</h3>
                   <p className="text-gray-600">Dely Brahim rue ahmed Ouaked - devant la banque ABC - Alger</p>
@@ -78,7 +78,7 @@ export default function ContactPageClient() {
               </div>
 
               <div className="flex items-start">
-                <Phone className="mr-3 h-5 w-5 text-pink-500" />
+                <Phone className="mr-3 h-5 w-5 text-emerald-500" />
                 <div>
                   <h3 className="font-medium">Téléphone</h3>
                   <p className="text-gray-600">05 52 79 66 95</p>
@@ -86,7 +86,7 @@ export default function ContactPageClient() {
               </div>
 
               <div className="flex items-start">
-                <Mail className="mr-3 h-5 w-5 text-pink-500" />
+                <Mail className="mr-3 h-5 w-5 text-emerald-500" />
                 <div>
                   <h3 className="font-medium">Email</h3>
                   <p className="text-gray-600">esprit.creativadeco@gmail.com</p>
@@ -135,7 +135,7 @@ export default function ContactPageClient() {
 
             {isSubmitted ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <CheckCircle className="mb-4 h-16 w-16 text-green-500" />
+                <CheckCircle className="mb-4 h-16 w-16 text-emerald-500" />
                 <h3 className="mb-2 text-xl font-semibold">Message envoyé !</h3>
                 <p className="mb-6 text-gray-600">
                   Merci de nous avoir contacté. Nous vous répondrons dans les plus brefs délais.

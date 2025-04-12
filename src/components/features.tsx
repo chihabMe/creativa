@@ -4,22 +4,22 @@ import * as motion from "motion/react-m"
 
 const features = [
   {
-    icon: <Package className="h-8 w-8 text-pink-500" />,
+    icon: <Package className="h-8 w-8 text-emerald-500" />,
     title: "Produit original",
     description: "Tous nos produits sont authentiques et de haute qualité",
   },
   {
-    icon: <UserCheck className="h-8 w-8 text-pink-500" />,
+    icon: <UserCheck className="h-8 w-8 text-emerald-500" />,
     title: "Client satisfait",
     description: "La satisfaction de nos clients est notre priorité",
   },
   {
-    icon: <Truck className="h-8 w-8 text-pink-500" />,
+    icon: <Truck className="h-8 w-8 text-emerald-500" />,
     title: "Livraison à domicile",
     description: "Livraison rapide et sécurisée partout en Algérie",
   },
   {
-    icon: <HeadphonesIcon className="h-8 w-8 text-pink-500" />,
+    icon: <HeadphonesIcon className="h-8 w-8 text-emerald-500" />,
     title: "Support client",
     description: "Notre équipe est disponible pour vous aider",
   },

@@ -34,7 +34,7 @@ export default  function OrdersList({filteredOrders}:Props) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "delivered":
-        return <Badge className="bg-green-500">Livré</Badge>
+        return <Badge className="bg-emerald-500">Livré</Badge>
       case "processing":
         return <Badge className="bg-blue-500">En cours</Badge>
       case "pending":

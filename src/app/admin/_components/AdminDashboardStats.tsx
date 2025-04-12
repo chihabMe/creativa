@@ -28,7 +28,7 @@ const AdminDashboardStats = ({ stats, recentOrders, lowStockProducts }: Props) =
       case "pending": return "bg-yellow-100 text-yellow-800"
       case "processing": return "bg-blue-100 text-blue-800"
       case "shipped": return "bg-purple-100 text-purple-800"
-      case "delivered": return "bg-green-100 text-green-800"
+      case "delivered": return "bg-emerald-100 text-emerald-800"
       case "cancelled": return "bg-red-100 text-red-800"
       default: return "bg-gray-100 text-gray-800"
     }
@@ -51,14 +51,14 @@ const AdminDashboardStats = ({ stats, recentOrders, lowStockProducts }: Props) =
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Ventes totales</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
+                <TrendingUp className="h-4 w-4 text-emerald-500" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {`${stats.totalSales.toLocaleString()} DA`}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={`font-medium flex items-center ${stats.salesGrowth >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  <span className={`font-medium flex items-center ${stats.salesGrowth >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                     {stats.salesGrowth >= 0 ? "+" : ""}{stats.salesGrowth.toFixed(1)}%
                     {stats.salesGrowth >= 0 ? 
                       <ArrowUpRight className="h-3 w-3 ml-1" /> : 
@@ -79,7 +79,7 @@ const AdminDashboardStats = ({ stats, recentOrders, lowStockProducts }: Props) =
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalOrders}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={`font-medium flex items-center ${stats.ordersGrowth >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  <span className={`font-medium flex items-center ${stats.ordersGrowth >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                     {stats.ordersGrowth >= 0 ? "+" : ""}{stats.ordersGrowth.toFixed(1)}%
                     {stats.ordersGrowth >= 0 ? 
                       <ArrowUpRight className="h-3 w-3 ml-1" /> : 
@@ -100,7 +100,7 @@ const AdminDashboardStats = ({ stats, recentOrders, lowStockProducts }: Props) =
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalProducts}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={`font-medium flex items-center ${stats.productsGrowth >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  <span className={`font-medium flex items-center ${stats.productsGrowth >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                     {stats.productsGrowth >= 0 ? "+" : ""}{stats.productsGrowth.toFixed(1)}%
                     {stats.productsGrowth >= 0 ? 
                       <ArrowUpRight className="h-3 w-3 ml-1" /> : 
@@ -121,7 +121,7 @@ const AdminDashboardStats = ({ stats, recentOrders, lowStockProducts }: Props) =
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalCustomers}</div>
                 <p className="text-xs text-muted-foreground">
-                  <span className={`font-medium flex items-center ${stats.customersGrowth >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  <span className={`font-medium flex items-center ${stats.customersGrowth >= 0 ? "text-emerald-500" : "text-red-500"}`}>
                     {stats.customersGrowth >= 0 ? "+" : ""}{stats.customersGrowth.toFixed(1)}%
                     {stats.customersGrowth >= 0 ? 
                       <ArrowUpRight className="h-3 w-3 ml-1" /> : 

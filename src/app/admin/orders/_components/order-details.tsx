@@ -111,7 +111,7 @@ export default function OrderDetails({ order }: Props) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "delivered":
-        return <Badge className="bg-green-500">Livré</Badge>
+        return <Badge className="bg-emerald-500">Livré</Badge>
       case "processing":
         return <Badge className="bg-blue-500">En cours</Badge>
       case "pending":
@@ -132,7 +132,7 @@ export default function OrderDetails({ order }: Props) {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "delivered":
-        return <CheckCircle className="h-5 w-5 text-green-500" />
+        return <CheckCircle className="h-5 w-5 text-emerald-500" />
       case "processing":
         return <Package className="h-5 w-5 text-blue-500" />
       case "pending":

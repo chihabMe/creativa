@@ -26,7 +26,7 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
     switch (status) {
       case "delivered":
         return (
-          <Badge className="bg-green-500">
+          <Badge className="bg-emerald-500">
             <CheckCircle className="mr-1 h-3 w-3" /> Livré
           </Badge>
         )

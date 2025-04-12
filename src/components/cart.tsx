@@ -476,7 +476,7 @@ export default function Cart() {
 
             {/* Progress indicator */}
             <motion.div
-              className="absolute bottom-0 left-0 h-1 bg-green-600"
+              className="absolute bottom-0 left-0 h-1 bg-emerald-600"
               initial={{ width: "0%" }}
               animate={{
                 width:
@@ -517,7 +517,7 @@ export default function Cart() {
                       <p className="mb-4 text-lg font-medium">
                         Votre panier est vide
                       </p>
-                      <Button className="bg-green-500" onClick={handleClose}>
+                      <Button className="bg-emerald-500" onClick={handleClose}>
                         Continuer vos achats
                       </Button>
                     </motion.div>
@@ -840,7 +840,7 @@ export default function Cart() {
                         />
                         <Label
                           htmlFor="home"
-                          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-green-600 peer-data-[state=checked]:bg-green-50"
+                          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-50"
                         >
                           <Home className="h-6 w-6" />
                           <span>À domicile</span>
@@ -854,7 +854,7 @@ export default function Cart() {
                         />
                         <Label
                           htmlFor="pickup"
-                          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-green-600 peer-data-[state=checked]:bg-green-50"
+                          className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-50"
                         >
                           <MapPin className="h-6 w-6" />
                           <span>Point de relais</span>
@@ -1043,7 +1043,7 @@ export default function Cart() {
                     />
                     <Label htmlFor="terms" className="text-sm">
                       J'ai lu et j'accepte les{" "}
-                      <a href="#" className="text-green-600 underline">
+                      <a href="#" className="text-emerald-600 underline">
                         conditions générales
                       </a>
                     </Label>
@@ -1066,7 +1066,7 @@ export default function Cart() {
                   className="flex flex-col items-center justify-center space-y-6 p-6 text-center"
                 >
                   <motion.div
-                    className="rounded-full bg-green-100 p-4"
+                    className="rounded-full bg-emerald-100 p-4"
                     initial={{ scale: 0.5, opacity: 0 }}
                     animate={{
                       scale: 1,
@@ -1092,7 +1092,7 @@ export default function Cart() {
                         },
                       }}
                     >
-                      <CheckCircle className="h-12 w-12 text-green-600" />
+                      <CheckCircle className="h-12 w-12 text-emerald-600" />
                     </motion.div>
                   </motion.div>
                   <motion.div
@@ -1206,7 +1206,7 @@ export default function Cart() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700"
                     onClick={handleContinue}
                     disabled={items.length === 0}
                   >
@@ -1221,7 +1221,7 @@ export default function Cart() {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700"
                     onClick={handleContinue}
                   >
                     Continuer
@@ -1235,7 +1235,7 @@ export default function Cart() {
                   whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 >
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700 transition-all duration-300"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 transition-all duration-300"
                     onClick={handleSubmitOrder}
                     disabled={isSubmitting || !formData.acceptTerms}
                   >

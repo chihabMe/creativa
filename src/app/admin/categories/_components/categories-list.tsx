@@ -127,7 +127,7 @@ export default function CategoriesList({ categories }: CategoriesListProps) {
                       <TableCell>{category.displayOrder}</TableCell>
                       <TableCell>
                         {category.featured ? (
-                          <Badge className="bg-green-500">Mise en avant</Badge>
+                          <Badge className="bg-emerald-500">Mise en avant</Badge>
                         ) : (
                           <Badge variant="outline">Normal</Badge>
                         )}

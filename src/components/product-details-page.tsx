@@ -187,7 +187,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                       <RadioGroupItem value={size.size} id={`size-${size.size}`} className="peer sr-only" />
                       <Label
                       htmlFor={`size-${size.size}`}
-                      className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-500 peer-data-[state=checked]:text-white"
+                      className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                       >
                       {size.size}
                       </Label>
@@ -210,7 +210,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                   <RadioGroupItem value={frame.frame} id={`frame-${frame.frame}`} className="peer sr-only" />
                   <Label
                   htmlFor={`frame-${frame.frame}`}
-                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-green-500 peer-data-[state=checked]:bg-green-500 peer-data-[state=checked]:text-white"
+                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-800 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                   >
                   {frame.frame}
                   </Label>
@@ -235,7 +235,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
 
             <div className="flex flex-col gap-2 pt-4 sm:flex-row">
               <Button
-                className="w-full bg-green-600 hover:bg-green-700"
+                className="w-1/3 h-12 bg-emerald-600  hover:bg-emerald-700"
                 size="lg"
                 onClick={handleBuyNow}
                 disabled={product.stock <= 0}
@@ -245,7 +245,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
               <div className="flex w-full gap-2">
                 <Button
                   variant="outline"
-                  className="flex-1"
+                  className="flex-1 h-12"
                   size="lg"
                   onClick={handleAddToCart}
                   disabled={product.stock <= 0}
