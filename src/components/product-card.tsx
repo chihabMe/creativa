@@ -86,7 +86,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -5 }}
     >
-      <Card className="overflow-hidden flex flex-col h-full">
+      <Card className="overflow-hidden shadow-none border-none flex flex-col h-full">
         <div className="relative">
           <Link href={`/products/${product.slug}`}>
             <div className="relative aspect-square overflow-hidden">
@@ -94,7 +94,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
                 src={(product.images?.[0]) || "/placeholder.svg"}
                 alt={product.name}
                 fill
-                className="object-cover transition-transform duration-300 hover:scale-105"
+                className="object-contain transition-transform duration-300 hover:scale-105"
               />
             </div>
           </Link>
@@ -111,7 +111,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
         <CardContent className="p-4 flex-grow">
           <Link href={`/products/${product.slug}`}>
             <h3 
-              className="mb-1 text-center text-sm font-medium h-4 md:h-12 overflow-hidden text-ellipsis whitespace-nowrap" 
+              className="mb-1 text-center  font-medium h-4 md:h-10 overflow-hidden text-ellipsis whitespace-nowrap" 
               title={product.name}
             >
               {product.name.length > 30 ? `${product.name.slice(0, 30)}...` : product.name}
