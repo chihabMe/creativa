@@ -1,13 +1,23 @@
-
 import Link from "next/link"
-import { Plus} from "lucide-react"
+import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getProducts, deleteProduct } from "@/lib/actions/product-actions"
+import { getAdminProducts } from "@/lib/actions/product-actions"
 import AdminProductsList from "./_components/admin-products-list"
+import { Pagination } from "@/components/ui/pagination"
+import { Paginator } from "@/components/paginator"
 
-export default async function ProductsPage() {
-  const products = await getProducts()
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; pageSize?: string }
+}) {
+  const page = Number(searchParams.page) || 1
+  const pageSize = Number(searchParams.pageSize) || 10
 
+  const { products, totalPages, currentPage } = await getAdminProducts({
+    page,
+    pageSize,
+  })
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -20,8 +30,16 @@ export default async function ProductsPage() {
           </Link>
         </Button>
       </div>
-      <AdminProductsList products={products}/>
-
+      <AdminProductsList products={products} />
+      
+      {/* Pagination component */}
+      <div className="flex justify-center mt-6">
+        <Paginator
+          totalPages={totalPages}
+          currentPage={currentPage}
+          baseUrl="/admin/products"
+        />
+      </div>
     </div>
   )
 }

@@ -181,6 +181,43 @@ export async function getProducts() {
     return []
   }
 }
+export async function getAdminProducts({
+  page = 1,
+  pageSize = 10,
+}: {
+  page?: number
+  pageSize?: number
+} = {}) {
+  try {
+    const skip = (page - 1) * pageSize
+    const take = pageSize
+
+    // Get total count for pagination
+    const totalProducts = await db.$count(products)
+    
+    // Get paginated products
+    const data = await db.query.products.findMany({
+      orderBy: (products, { desc }) => [desc(products.createdAt)],
+      limit: take,
+      offset: skip,
+    })
+
+    return {
+      products:data,
+      totalProducts,
+      totalPages: Math.ceil(totalProducts / pageSize),
+      currentPage: page,
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error)
+    return {
+      products: [],
+      totalProducts: 0,
+      totalPages: 0,
+      currentPage: 1,
+    }
+  }
+}
 
 // Get a product by ID (for admin use - no caching)
 export async function getProductById(id: string) {

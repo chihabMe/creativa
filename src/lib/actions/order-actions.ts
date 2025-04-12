@@ -124,9 +124,23 @@ export const updateOrderStatus = adminAction.schema(updateOrderStatusSchema).act
 })
 
 // Get all orders (for admin use)
-export async function getOrders() {
+// Get an order by ID
+export async function getOrders({
+  page = 1,
+  pageSize = 10,
+}: {
+  page?: number
+  pageSize?: number
+} = {}) {
   try {
-    return await db.query.orders.findMany({
+    const skip = (page - 1) * pageSize
+    const take = pageSize
+
+    // Get total count for pagination
+    const totalOrders = await db.$count(orders)
+    
+    // Get paginated orders
+    const data = await db.query.orders.findMany({
       orderBy: (orders, { desc }) => [desc(orders.createdAt)],
       with: {
         orderItems: {
@@ -135,14 +149,26 @@ export async function getOrders() {
           },
         },
       },
+      limit: take,
+      offset: skip,
     })
+
+    return {
+      orders:data,
+      totalOrders,
+      totalPages: Math.ceil(totalOrders / pageSize),
+      currentPage: page,
+    }
   } catch (error) {
     console.error("Error fetching orders:", error)
-    return []
+    return {
+      orders: [],
+      totalOrders: 0,
+      totalPages: 0,
+      currentPage: 1,
+    }
   }
 }
-
-// Get an order by ID
 export async function getOrderById(id: string) {
   try {
     return await db.query.orders.findFirst({

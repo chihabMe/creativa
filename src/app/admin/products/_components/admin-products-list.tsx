@@ -12,12 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ProductSearch } from "@/components/admin/product-search"
 import Image from "next/image"
 import {  Edit, Trash2, Eye, MoreHorizontal } from "lucide-react"
-import { getProducts } from "@/lib/actions/product-actions"
+import { getAdminProducts  } from "@/lib/actions/product-actions"
 import {  deleteProduct } from "@/lib/actions/product-actions"
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 interface Props {
-    products :Awaited<ReturnType<typeof getProducts>>,
+    products :Awaited<ReturnType<typeof getAdminProducts>>['products'],
 
 }
 const AdminProductsList = ({products}:Props) => {

@@ -18,7 +18,7 @@ import { OrderSearch } from "@/components/admin/order-search"
 import { OrderStatusFilter } from "@/components/admin/order-status-filter"
 
 interface Props {
-    filteredOrders:Awaited<ReturnType<typeof getOrders>>
+    filteredOrders:Awaited<ReturnType<typeof getOrders>>["orders"]
 }
 export default  function OrdersList({filteredOrders}:Props) {
 
