@@ -210,8 +210,8 @@ export default function Cart() {
   const {
     items,
     totalPrice,
-    // isOpen,
-    // closeCart,
+    isOpen,
+    closeCart,
     removeItem,
     updateQuantity,
     totalItems,
@@ -428,8 +428,8 @@ export default function Cart() {
   };
 
   return (
-    <Sheet modal>
-      <SheetTrigger asChild>
+    <Sheet open={isOpen} onOpenChange={handleClose}>
+      {/* <SheetTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
@@ -443,7 +443,7 @@ export default function Cart() {
             </span>
           </div>
         </Button>
-      </SheetTrigger>
+      </SheetTrigger> */}
       <SheetContent className="w-full max-w-md p-0 sm:max-w-lg">
         <motion.div
           className="flex h-full flex-col"

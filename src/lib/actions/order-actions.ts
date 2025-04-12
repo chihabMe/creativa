@@ -7,7 +7,7 @@ import { db } from "@/lib/db"
 import { orders, orderItems } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import { nanoid } from "nanoid"
-import { CACHE_TAGS } from "../data";
+import { CACHE_TAGS } from "../constants";
 
 // Schema for deleting an order
 // Schema for creating a new order

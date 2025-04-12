@@ -1,23 +1,31 @@
+"use server";
 import { unstable_cache } from "next/cache"
 import { db } from "@/lib/db"
-import { orders, products, users } from "@/lib/db/schema"
-import { eq, like, desc, sql, inArray, sum, gte, count, lt, and } from "drizzle-orm"
+import { products, categories, productCategories, orders, users } from "@/lib/db/schema"
+import { eq, like, desc, sql, and, sum, gte, count, lt } from "drizzle-orm"
+import { CACHE_TAGS } from "./constants";
 
-// Cache tags for different types of data
-export const CACHE_TAGS = {
-  products: "products",
-  categories: "categories",
-  featured: "featured",
-  orders: "orders",
-}
 
 // Get all products with caching
 export const getAllProducts = unstable_cache(
   async () => {
     try {
-      return await db.query.products.findMany({
+      const productsData = await db.query.products.findMany({
         orderBy: [desc(products.createdAt)],
+        with: {
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
       })
+
+      // Transform the data to include category information
+      return productsData.map((product) => ({
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }))
     } catch (error) {
       console.error("Error fetching all products:", error)
       return []
@@ -34,11 +42,24 @@ export const getAllProducts = unstable_cache(
 export const getFeaturedProducts = unstable_cache(
   async (limit = 8) => {
     try {
-      return await db.query.products.findMany({
+      const productsData = await db.query.products.findMany({
         where: eq(products.featured, true),
         orderBy: [desc(products.createdAt)],
         limit,
+        with: {
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
       })
+
+      // Transform the data to include category information
+      return productsData.map((product) => ({
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }))
     } catch (error) {
       console.error("Error fetching featured products:", error)
       return []
@@ -53,14 +74,42 @@ export const getFeaturedProducts = unstable_cache(
 
 // Get products by category with caching
 export const getProductsByCategory = unstable_cache(
-  async (category: string) => {
+  async (categorySlug: string) => {
     try {
-      return await db.query.products.findMany({
-        where: sql`${products.categories}::jsonb @> ${'["' + category + '"]'}::jsonb`,
-        orderBy: [desc(products.createdAt)],
+      // First, find the category ID from the slug
+      const category = await db.query.categories.findFirst({
+        where: eq(categories.slug, categorySlug),
+        columns: {
+          id: true,
+        },
       })
+
+      if (!category) return []
+
+      // Then, find all products in that category
+      const productsData = await db.query.productCategories.findMany({
+        where: eq(productCategories.categoryId, category.id),
+        with: {
+          product: {
+            with: {
+              productCategories: {
+                with: {
+                  category: true,
+                },
+              },
+            },
+          },
+        },
+        // orderBy: (pc, { desc }) => [desc(pc.productId.createdAt)],
+      })
+
+      // Transform the data to include category information
+      return productsData.map((pc) => ({
+        ...pc.product,
+        categories: pc.product.productCategories.map((innerPc) => innerPc.category.slug),
+      }))
     } catch (error) {
-      console.error(`Error fetching products by category ${category}:`, error)
+      console.error(`Error fetching products by category ${categorySlug}:`, error)
       return []
     }
   },
@@ -75,16 +124,24 @@ export const getProductsByCategory = unstable_cache(
 export const getProductById = unstable_cache(
   async (id: string) => {
     try {
-      return await db.query.products.findFirst({
+      const product = await db.query.products.findFirst({
         where: eq(products.id, id),
-        with:{
+        with: {
           productCategories: {
             with: {
               category: true,
             },
           },
-        }
+        },
       })
+
+      if (!product) return null
+
+      // Transform the data to include category information
+      return {
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }
     } catch (error) {
       console.error(`Error fetching product by ID ${id}:`, error)
       return null
@@ -95,16 +152,30 @@ export const getProductById = unstable_cache(
     tags: [CACHE_TAGS.products],
     revalidate: 3600, // Revalidate every hour
   },
-
 )
 
 // Get product by slug with caching
 export const getProductBySlug = unstable_cache(
   async (slug: string) => {
     try {
-      return await db.query.products.findFirst({
+      const product = await db.query.products.findFirst({
         where: eq(products.slug, slug),
+        with: {
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
       })
+
+      if (!product) return null
+
+      // Transform the data to include category information
+      return {
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }
     } catch (error) {
       console.error(`Error fetching product by slug ${slug}:`, error)
       return null
@@ -121,10 +192,23 @@ export const getProductBySlug = unstable_cache(
 export const searchProducts = unstable_cache(
   async (query: string) => {
     try {
-      return await db.query.products.findMany({
+      const productsData = await db.query.products.findMany({
         where: like(products.name, `%${query}%`),
         orderBy: [desc(products.createdAt)],
+        with: {
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
       })
+
+      // Transform the data to include category information
+      return productsData.map((product) => ({
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }))
     } catch (error) {
       console.error(`Error searching products with query ${query}:`, error)
       return []
@@ -139,14 +223,41 @@ export const searchProducts = unstable_cache(
 
 // Get related products with caching
 export const getRelatedProducts = unstable_cache(
-  async (productId: string, categorySlug: string, limit = 4) => {
+  async (productId: number, categorySlug: string, limit = 4) => {
     try {
-      // Get products in the same category, excluding the current product
-      return await db.query.products.findMany({
-        where: sql`${products.id} != ${productId} AND ${products.categories}::jsonb @> ${'["' + categorySlug + '"]'}::jsonb`,
-        orderBy: [desc(products.createdAt)],
+      // First, find the category ID from the slug
+      const category = await db.query.categories.findFirst({
+        where: eq(categories.slug, categorySlug),
+        columns: {
+          id: true,
+        },
+      })
+
+      if (!category) return []
+
+      // Then, find all products in that category, excluding the current product
+      const productsData = await db.query.productCategories.findMany({
+        where: and(eq(productCategories.categoryId, category.id), sql`${productCategories.productId} != ${productId}`),
+        with: {
+          product: {
+            with: {
+              productCategories: {
+                with: {
+                  category: true,
+                },
+              },
+            },
+          },
+        },
+        // orderBy: (pc, { desc }) => [desc(pc.productId.createdAt)],
         limit,
       })
+
+      // Transform the data to include category information
+      return productsData.map((pc) => ({
+        ...pc.product,
+        categories: pc.product.productCategories.map((innerPc) => innerPc.category.slug),
+      }))
     } catch (error) {
       console.error(`Error fetching related products for product ${productId}:`, error)
       return []
@@ -163,21 +274,9 @@ export const getRelatedProducts = unstable_cache(
 export const getAllCategories = unstable_cache(
   async () => {
     try {
-      const result = await db.query.products.findMany({
-        columns: {
-          categories: true,
-        },
+      return await db.query.categories.findMany({
+        orderBy: [sql`${categories.displayOrder} ASC, ${categories.name} ASC`],
       })
-
-      // Extract all unique categories
-      const categoriesSet = new Set<string>()
-      result.forEach((product) => {
-        if (product.categories && Array.isArray(product.categories)) {
-          product.categories.forEach((category) => categoriesSet.add(category))
-        }
-      })
-
-      return Array.from(categoriesSet)
     } catch (error) {
       console.error("Error fetching all categories:", error)
       return []
@@ -192,13 +291,26 @@ export const getAllCategories = unstable_cache(
 
 // Get products by IDs with caching
 export const getProductsByIds = unstable_cache(
-  async (ids: string[]) => {
+  async (ids: number[]) => {
     try {
       if (ids.length === 0) return []
 
-      return await db.query.products.findMany({
-        where: inArray(products.id,ids)
+      const productsData = await db.query.products.findMany({
+        where: sql`${products.id} IN (${ids.join(",")})`,
+        with: {
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        },
       })
+
+      // Transform the data to include category information
+      return productsData.map((product) => ({
+        ...product,
+        categories: product.productCategories.map((pc) => pc.category.slug),
+      }))
     } catch (error) {
       console.error(`Error fetching products by IDs:`, error)
       return []
@@ -211,9 +323,101 @@ export const getProductsByIds = unstable_cache(
   },
 )
 
+// Get all categories from the categories table with caching
+export const getCategoriesFromDB = unstable_cache(
+  async () => {
+    try {
+      return await db.query.categories.findMany({
+        orderBy: [sql`${categories.displayOrder} ASC, ${categories.name} ASC`],
+      })
+    } catch (error) {
+      console.error("Error fetching categories from DB:", error)
+      return []
+    }
+  },
+  ["categories-from-db"],
+  {
+    tags: [CACHE_TAGS.categories],
+    revalidate: 3600, // Revalidate every hour
+  },
+)
+
+// Get featured categories with caching
+export const getFeaturedCategoriesFromDB = unstable_cache(
+  async () => {
+    try {
+      return await db.query.categories.findMany({
+        where: eq(categories.featured, true),
+        orderBy: [sql`${categories.displayOrder} ASC, ${categories.name} ASC`],
+      })
+    } catch (error) {
+      console.error("Error fetching featured categories:", error)
+      return []
+    }
+  },
+  ["featured-categories"],
+  {
+    tags: [CACHE_TAGS.categories, CACHE_TAGS.featured],
+    revalidate: 3600, // Revalidate every hour
+  },
+)
+
+// Get categories by group with caching
+export const getCategoriesByGroupFromDB = unstable_cache(
+  async () => {
+    try {
+      const allCategories = await db.query.categories.findMany({
+        orderBy: [sql`${categories.displayOrder} ASC, ${categories.name} ASC`],
+      })
+
+      // Group categories by groupName
+      const groupedCategories = allCategories.reduce(
+        (acc, category) => {
+          const groupName = category.groupName || "Autres"
+          if (!acc[groupName]) {
+            acc[groupName] = []
+          }
+          acc[groupName].push(category)
+          return acc
+        },
+        {} as Record<string, typeof allCategories>,
+      )
+
+      return groupedCategories
+    } catch (error) {
+      console.error("Error fetching categories by group:", error)
+      return {}
+    }
+  },
+  ["categories-by-group"],
+  {
+    tags: [CACHE_TAGS.categories],
+    revalidate: 3600, // Revalidate every hour
+  },
+)
+
+// Get category by slug with caching
+export const getCategoryBySlugFromDB = unstable_cache(
+  async (slug: string) => {
+    try {
+      return await db.query.categories.findFirst({
+        where: eq(categories.slug, slug),
+      })
+    } catch (error) {
+      console.error(`Error fetching category by slug ${slug}:`, error)
+      return null
+    }
+  },
+  ["category-by-slug"],
+  {
+    tags: [CACHE_TAGS.categories],
+    revalidate: 3600, // Revalidate every hour
+  },
+)
+
 
 // Cache tags for dashboard data
-export const DASHBOARD_CACHE_TAGS = {
+const DASHBOARD_CACHE_TAGS = {
   dashboardStats: "dashboard-stats",
   recentOrders: "recent-orders",
   lowStockProducts: "low-stock-products",

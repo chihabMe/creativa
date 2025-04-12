@@ -6,7 +6,7 @@ import { db } from "@/lib/db"
 import { productCategories, products } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import slugify from "slugify"
-import { CACHE_TAGS } from "@/lib/data"
+import { CACHE_TAGS } from "../constants"
 
 // Schema for creating a product
 const createProductSchema = z.object({
