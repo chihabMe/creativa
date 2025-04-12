@@ -74,7 +74,7 @@ export const getFeaturedProducts = unstable_cache(
 
 // Get products by category with caching
 export const getProductsByCategory = unstable_cache(
-  async (categorySlug: string) => {
+  async (categorySlug: string,limit?:number) => {
     try {
       // First, find the category ID from the slug
       const category = await db.query.categories.findFirst({
@@ -89,6 +89,7 @@ export const getProductsByCategory = unstable_cache(
       // Then, find all products in that category
       const productsData = await db.query.productCategories.findMany({
         where: eq(productCategories.categoryId, category.id),
+        limit,
         with: {
           product: {
             with: {

@@ -4,11 +4,14 @@ import Footer from "@/components/footer";
 import ProductGrid from "@/components/product-grid";
 import Features from "@/components/features";
 import Header from "@/components/header";
-import { getFeaturedProducts } from "@/lib/data";
+import {
+  getFeaturedCategoriesFromDB,
+  getFeaturedProducts,
+  getProductsByCategory,
+} from "@/lib/data";
 import HomeJsonLd from "./home-jsonld";
 
-export async function generateMetadata(
-): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   // Get the parent metadata (if any)
 
   // Define the metadata for the home page
@@ -50,7 +53,17 @@ export async function generateMetadata(
 
 export default async function Home() {
   // Fetch featured products from the database
-  const featuredProducts = await getFeaturedProducts(12);
+  const featuredProducts = await getFeaturedProducts(16);
+  const featuredCategories = await getFeaturedCategoriesFromDB();
+  const productsForEachCategory = await Promise.all(
+    featuredCategories.map(async (category) => {
+      const products = await getProductsByCategory(category.slug, 4);
+      return {
+        ...category,
+        products,
+      };
+    })
+  );
 
   return (
     <>
@@ -58,6 +71,9 @@ export default async function Home() {
       <main className="flex min-h-screen flex-col">
         <Hero />
         <ProductGrid products={featuredProducts} title="Nouveauté" />
+        {productsForEachCategory.map((item) => (
+          <ProductGrid products={item.products} title={item.name} />
+        ))}
         <Features />
         <HomeJsonLd />
       </main>
