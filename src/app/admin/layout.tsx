@@ -65,10 +65,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       active: pathname === "/admin/orders",
     },
     {
-      href: "/admin/customers",
-      label: "Clients",
+      href: "/admin/categories",
+      label: "Categories",
       icon: <Users className="mr-2 h-4 w-4" />,
-      active: pathname === "/admin/customers",
+      active: pathname === "/admin/categories",
     },
     {
       href: "/admin/settings",

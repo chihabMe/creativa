@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { integer, pgTable, primaryKey, serial, text, timestamp, boolean, pgEnum, json, uuid } from "drizzle-orm/pg-core"
+import { pgTable, primaryKey, text, timestamp, boolean, pgEnum, json, uuid, integer } from "drizzle-orm/pg-core"
 
 // Enums
 export const orderStatusEnum = pgEnum("order_status", ["pending", "processing", "shipped", "delivered", "cancelled"])
@@ -18,6 +18,19 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 })
 
+// Categories table
+export const categories = pgTable("categories", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(),
+  description: text("description"),
+  featured: boolean("featured").default(false),
+  displayOrder: integer("display_order").default(0),
+  groupName: text("group_name"), // For grouping in dropdown (e.g., "Modèles", "Catégories", "Styles")
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+})
+
 // Products table
 export const products = pgTable("products", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -29,18 +42,33 @@ export const products = pgTable("products", {
   badge: productBadgeEnum("badge").default("none"),
   featured: boolean("featured").default(false),
   images: json("images").$type<string[]>().default([]),
-  categories: json("categories").$type<string[]>().default([]),
   sizes: json("sizes").$type<{ size: string; price: number }[]>().default([]),
   frames: json("frames").$type<{ frame: string; price: number }[]>().default([]),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 })
 
+// Product-Category junction table for many-to-many relationship
+export const productCategories = pgTable(
+  "product_categories",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    categoryId: uuid("category_id")
+      .notNull()
+      .references(() => categories.id, { onDelete: "cascade" }),
+  },
+  (t) => ({
+    pk: primaryKey({ columns: [t.productId, t.categoryId] }),
+  }),
+)
+
 // Orders table
 export const orders = pgTable("orders", {
   id: uuid("id").defaultRandom().primaryKey(),
   orderNumber: text("order_number").notNull().unique(),
-  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }), // Also UUID ✅
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
   customerName: text("customer_name").notNull(),
   customerEmail: text("customer_email").notNull(),
   customerPhone: text("customer_phone"),
@@ -79,8 +107,24 @@ export const orderItems = pgTable(
 )
 
 // Relations
+export const categoriesRelations = relations(categories, ({ many, one }) => ({
+  productCategories: many(productCategories),
+}))
+
 export const productsRelations = relations(products, ({ many }) => ({
   orderItems: many(orderItems),
+  productCategories: many(productCategories),
+}))
+
+export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
+  product: one(products, {
+    fields: [productCategories.productId],
+    references: [products.id],
+  }),
+  category: one(categories, {
+    fields: [productCategories.categoryId],
+    references: [categories.id],
+  }),
 }))
 
 export const ordersRelations = relations(orders, ({ many, one }) => ({

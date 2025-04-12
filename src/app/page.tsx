@@ -8,11 +8,8 @@ import { getFeaturedProducts } from "@/lib/data";
 import HomeJsonLd from "./home-jsonld";
 
 export async function generateMetadata(
-  _: any,
-  parent: ResolvingMetadata
 ): Promise<Metadata> {
   // Get the parent metadata (if any)
-  const parentMetadata = await parent;
 
   // Define the metadata for the home page
   return {
@@ -53,14 +50,14 @@ export async function generateMetadata(
 
 export default async function Home() {
   // Fetch featured products from the database
-  const products = await getFeaturedProducts(12);
+  const featuredProducts = await getFeaturedProducts(12);
 
   return (
     <>
       <Header />
       <main className="flex min-h-screen flex-col">
         <Hero />
-        <ProductGrid products={products} title="Nouveauté" />
+        <ProductGrid products={featuredProducts} title="Nouveauté" />
         <Features />
         <HomeJsonLd />
       </main>

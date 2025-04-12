@@ -41,17 +41,6 @@ export default function ProductGrid({
         ))}
       </div>
 
-      <div className="mt-12 flex justify-center">
-        <Link href={"/search"}>
-          <motion.button
-            className="rounded-md bg-black px-6 py-2 text-white transition-colors hover:bg-black/80"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-          >
-            Voir plus
-          </motion.button>
-        </Link>
-      </div>
     </section>
   );
 }

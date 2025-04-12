@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getProductById } from "@/lib/actions/product-actions";
 import EditProduct from "../../_components/edit-product";
+import { getCategories } from "@/lib/actions/ category-actions";
 
 export default async function EditProductPage({
   params,
@@ -9,11 +10,12 @@ export default async function EditProductPage({
 }) {
   const productId = params.id;
   const product = await getProductById(productId);
+  const categories = await getCategories();
   if (!product) return notFound();
 
   return (
     <main>
-      <EditProduct product={product} />
+      <EditProduct product={product} categories={categories} />
     </main>
   );
 }

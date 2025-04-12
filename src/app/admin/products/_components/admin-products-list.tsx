@@ -77,17 +77,17 @@ const AdminProductsList = ({products}:Props) => {
                       <TableCell>{product.stock}</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {(product.categories ?? []).slice(0, 2).map((category, index) => (
+                          {(product.productCategories ?? []).slice(0, 2).map((category, index) => (
                             <span
                               key={index}
                               className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800"
                             >
-                              {category}
+                              {category.category.name}
                             </span>
                           ))}
-                          {(product.categories?.length ?? 0) > 2 && (
+                          {(product.productCategories?.length ?? 0) > 2 && (
                             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-800">
-                              +{(product.categories?.length ?? 0) - 2}
+                              +{(product.productCategories?.length ?? 0) - 2}
                             </span>
                           )}
                         </div>

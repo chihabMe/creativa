@@ -1,159 +1,108 @@
-"use client";
-import { ImageUploader } from "@/components/admin/image-uploader";
-import { ArrowLeft, Save } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/components/ui/use-toast";
-import { Plus, X } from "lucide-react";
-import type { getProductById } from "@/lib/data";
-import type React from "react";
-import { updateProduct } from "@/lib/actions/product-actions";
-import { getCategories } from "@/lib/actions/ category-actions";
+"use client"
 
-interface Props {
-  product: NonNullable<Awaited<ReturnType<typeof getProductById>>>;
-  categories: Awaited<ReturnType<typeof getCategories>>;
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { ArrowLeft, Save, Plus, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { useToast } from "@/components/ui/use-toast"
+import { createProduct } from "@/lib/actions/product-actions"
+import { ImageUploader } from "@/components/admin/image-uploader"
+import { getCategories } from "@/lib/actions/ category-actions"
+
+type Category = Awaited<ReturnType<typeof getCategories>>[0]
+
+interface NewProductFormProps {
+  categories: Category[]
 }
 
-const EditProduct = ({ product, categories }: Props) => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const productImages =
-    product?.images?.map((url: string) => {
-      const parts = url.split("/");
-      const filename = parts[parts.length - 1];
-      const folderPath = parts[parts.length - 2];
-      // Remove file extension
-      const publicIdBase = filename.split(".")[0];
-      const publicId = `${folderPath}/${publicIdBase}`;
-
-      return {
-        url,
-        publicId,
-      };
-    }) ?? [];
+export default function NewProductForm({ categories }: NewProductFormProps) {
+  const router = useRouter()
+  const { toast } = useToast()
 
   const [formData, setFormData] = useState({
-    name: product.name,
-    price: product.price.toString(),
-    description: product.description || "",
-    stock: product.stock.toString(),
-    categories:
-      product.productCategories?.map(
-        (productCategory) => productCategory.category.slug
-      ) || ([] as string[]),
-    badge: product.badge || "none",
-    featured: product.featured || false,
-    sizes:
-      product.sizes?.map((size: { size: string; price: number }) => ({
-        size: size.size,
-        price: size.price.toString(),
-      })) || [],
-    frames:
-      product.frames?.map((frame: { frame: string; price: number }) => ({
-        frame: frame.frame,
-        price: frame.price.toString(),
-      })) || [],
-  });
+    name: "",
+    price: "",
+    description: "",
+    stock: "",
+    categoryIds: [] as string[],
+    badge: "none",
+    featured: false,
+    sizes: [] as { size: string; price: string }[],
+    frames: [] as { frame: string; price: string }[],
+  })
 
-  const [images, setImages] =
-    useState<{ url: string; publicId: string }[]>(productImages);
+  const [images, setImages] = useState<{ url: string; publicId: string }[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Fetch categories from the database
-
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
   const handleCategoryChange = (categorySlug: string) => {
-    if (formData.categories.includes(categorySlug)) {
+    if (formData.categoryIds.includes(categorySlug)) {
       setFormData((prev) => ({
         ...prev,
-        categories: prev.categories.filter((cat) => cat !== categorySlug),
-      }));
+        categoryIds: prev.categoryIds.filter((cat: string) => cat !== categorySlug),
+      }))
     } else {
       setFormData((prev) => ({
         ...prev,
-        categories: [...prev.categories, categorySlug],
-      }));
+        categoryIds: [...prev.categoryIds, categorySlug],
+      }))
     }
-  };
+  }
 
   const handleAddSize = () => {
     setFormData((prev) => ({
       ...prev,
       sizes: [...prev.sizes, { size: "", price: "" }],
-    }));
-  };
+    }))
+  }
 
-  const handleSizeChange = (
-    index: number,
-    field: "size" | "price",
-    value: string
-  ) => {
-    const newSizes = [...formData.sizes];
-    newSizes[index][field] = value;
-    setFormData((prev) => ({ ...prev, sizes: newSizes }));
-  };
+  const handleSizeChange = (index: number, field: "size" | "price", value: string) => {
+    const newSizes = [...formData.sizes]
+    newSizes[index][field] = value
+    setFormData((prev) => ({ ...prev, sizes: newSizes }))
+  }
 
   const handleRemoveSize = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       sizes: prev.sizes.filter((_, i) => i !== index),
-    }));
-  };
+    }))
+  }
 
   const handleAddFrame = () => {
     setFormData((prev) => ({
       ...prev,
       frames: [...prev.frames, { frame: "", price: "" }],
-    }));
-  };
+    }))
+  }
 
-  const handleFrameChange = (
-    index: number,
-    field: "frame" | "price",
-    value: string
-  ) => {
-    const newFrames = [...formData.frames];
-    newFrames[index][field] = value;
-    setFormData((prev) => ({ ...prev, frames: newFrames }));
-  };
+  const handleFrameChange = (index: number, field: "frame" | "price", value: string) => {
+    const newFrames = [...formData.frames]
+    newFrames[index][field] = value
+    setFormData((prev) => ({ ...prev, frames: newFrames }))
+  }
 
   const handleRemoveFrame = (index: number) => {
     setFormData((prev) => ({
       ...prev,
       frames: prev.frames.filter((_, i) => i !== index),
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+    e.preventDefault()
+    setIsSubmitting(true)
 
     try {
       // Validate that we have at least one image
@@ -162,14 +111,13 @@ const EditProduct = ({ product, categories }: Props) => {
           title: "Erreur",
           description: "Veuillez ajouter au moins une image pour le produit.",
           variant: "destructive",
-        });
-        setIsSubmitting(false);
-        return;
+        })
+        setIsSubmitting(false)
+        return
       }
 
       // Convert form data to the format expected by the server action
       const productData = {
-        id: product.id,
         name: formData.name,
         price: Number(formData.price),
         description: formData.description,
@@ -177,13 +125,9 @@ const EditProduct = ({ product, categories }: Props) => {
         badge: formData.badge as "none" | "new" | "bestseller" | "sale",
         featured: formData.featured,
         images: images.map((img) => img.url), // We only need the URLs for the database
-        categories: formData.categories,
-        categoryIds: formData.categories
-          .map((category) => {
-            const categoryObj = categories.find((cat) => cat.slug === category);
-            return categoryObj ? categoryObj.id : null;
-          })
-          .filter(Boolean) as string[],
+        categoryIds: formData.categoryIds
+          .map((cat) => categories.find((c) => c.slug === cat)?.id)
+          .filter((id): id is string => Boolean(id)),
         sizes: formData.sizes.map((size) => ({
           size: size.size,
           price: Number(size.price),
@@ -192,36 +136,33 @@ const EditProduct = ({ product, categories }: Props) => {
           frame: frame.frame,
           price: Number(frame.price),
         })),
-      };
+      }
 
-      console.log(productData);
-      const result = await updateProduct(productData);
-      console.log(result);
+      const result = await createProduct(productData)
 
       if (result?.data?.success) {
         toast({
           title: "Succès",
           description: result.data.message,
-        });
-        router.push("/admin/products");
+        })
+        router.push("/admin/products")
       } else {
         toast({
           title: "Erreur",
-          description: result?.data?.message ?? "",
+          description: result?.data?.message ?? "Une erreur est survenue lors de la création du produit.",
           variant: "destructive",
-        });
+        })
       }
     } catch (error) {
       toast({
         title: "Erreur",
-        description:
-          "Une erreur est survenue lors de la mise à jour du produit.",
+        description: "Une erreur est survenue lors de la création du produit.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
@@ -230,9 +171,7 @@ const EditProduct = ({ product, categories }: Props) => {
           <Button variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h2 className="text-3xl font-bold tracking-tight">
-            Modifier le produit
-          </h2>
+          <h2 className="text-3xl font-bold tracking-tight">Ajouter un produit</h2>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={() => router.back()}>
@@ -256,9 +195,7 @@ const EditProduct = ({ product, categories }: Props) => {
           <Card>
             <CardHeader>
               <CardTitle>Informations du produit</CardTitle>
-              <CardDescription>
-                Modifiez les détails de base du produit.
-              </CardDescription>
+              <CardDescription>Entrez les détails de base du produit.</CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-4">
@@ -314,9 +251,7 @@ const EditProduct = ({ product, categories }: Props) => {
                   <Label>Badge</Label>
                   <Select
                     value={formData.badge}
-                    onValueChange={(
-                      value: "none" | "new" | "bestseller" | "sale"
-                    ) => setFormData((prev) => ({ ...prev, badge: value }))}
+                    onValueChange={(value) => setFormData((prev) => ({ ...prev, badge: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner un badge (optionnel)" />
@@ -334,12 +269,7 @@ const EditProduct = ({ product, categories }: Props) => {
                   <Checkbox
                     id="featured"
                     checked={formData.featured}
-                    onCheckedChange={(checked) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        featured: checked as boolean,
-                      }))
-                    }
+                    onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, featured: checked as boolean }))}
                   />
                   <Label htmlFor="featured">Produit en vedette</Label>
                 </div>
@@ -350,9 +280,7 @@ const EditProduct = ({ product, categories }: Props) => {
           <Card className="mt-4">
             <CardHeader>
               <CardTitle>Variantes</CardTitle>
-              <CardDescription>
-                Modifiez les tailles et options d'encadrement pour ce produit.
-              </CardDescription>
+              <CardDescription>Ajoutez des tailles et options d'encadrement pour ce produit.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -366,38 +294,62 @@ const EditProduct = ({ product, categories }: Props) => {
                   </div>
 
                   {formData.sizes.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      Aucune taille ajoutée.
-                    </p>
+                    <p className="text-sm text-muted-foreground">Aucune taille ajoutée.</p>
                   ) : (
                     <div className="space-y-2">
                       {formData.sizes.map((size, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2"
-                        >
+                        <div key={index} className="flex items-center space-x-2">
                           <Input
                             value={size.size}
-                            onChange={(e) =>
-                              handleSizeChange(index, "size", e.target.value)
-                            }
+                            onChange={(e) => handleSizeChange(index, "size", e.target.value)}
                             placeholder="ex: 1M×50CM"
                             className="flex-1"
                           />
                           <Input
                             value={size.price}
-                            onChange={(e) =>
-                              handleSizeChange(index, "price", e.target.value)
-                            }
+                            onChange={(e) => handleSizeChange(index, "price", e.target.value)}
                             placeholder="Prix (DA)"
                             type="number"
                             className="w-32"
                           />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveFrame(index)}
-                          >
+                          <Button variant="ghost" size="icon" onClick={() => handleRemoveSize(index)}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Options d'encadrement</Label>
+                    <Button variant="outline" size="sm" onClick={handleAddFrame}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Ajouter une option
+                    </Button>
+                  </div>
+
+                  {formData.frames.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Aucune option d'encadrement ajoutée.</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {formData.frames.map((frame, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <Input
+                            value={frame.frame}
+                            onChange={(e) => handleFrameChange(index, "frame", e.target.value)}
+                            placeholder="ex: SANS ENCADREMENT"
+                            className="flex-1"
+                          />
+                          <Input
+                            value={frame.price}
+                            onChange={(e) => handleFrameChange(index, "price", e.target.value)}
+                            placeholder="Supplément (DA)"
+                            type="number"
+                            className="w-32"
+                          />
+                          <Button variant="ghost" size="icon" onClick={() => handleRemoveFrame(index)}>
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
@@ -414,34 +366,23 @@ const EditProduct = ({ product, categories }: Props) => {
           <Card>
             <CardHeader>
               <CardTitle>Catégories</CardTitle>
-              <CardDescription>
-                Sélectionnez les catégories pour ce produit.
-              </CardDescription>
+              <CardDescription>Sélectionnez les catégories pour ce produit.</CardDescription>
             </CardHeader>
             <CardContent>
               {categories.length === 0 ? (
                 <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">
-                    Aucune catégorie disponible.
-                  </p>
+                  <p className="text-sm text-muted-foreground">Aucune catégorie disponible.</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   {categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className="flex items-center space-x-2"
-                    >
+                    <div key={category.id} className="flex items-center space-x-2">
                       <Checkbox
                         id={`category-${category.slug}`}
-                        checked={formData.categories.includes(category.slug)}
-                        onCheckedChange={() =>
-                          handleCategoryChange(category.slug)
-                        }
+                        checked={formData.categoryIds.includes(category.slug)}
+                        onCheckedChange={() => handleCategoryChange(category.slug)}
                       />
-                      <Label htmlFor={`category-${category.slug}`}>
-                        {category.name}
-                      </Label>
+                      <Label htmlFor={`category-${category.slug}`}>{category.name}</Label>
                     </div>
                   ))}
                 </div>
@@ -452,22 +393,14 @@ const EditProduct = ({ product, categories }: Props) => {
           <Card>
             <CardHeader>
               <CardTitle>Images</CardTitle>
-              <CardDescription>
-                Modifiez les images pour ce produit.
-              </CardDescription>
+              <CardDescription>Ajoutez des images pour ce produit.</CardDescription>
             </CardHeader>
             <CardContent>
-              <ImageUploader
-                images={images}
-                onChange={setImages}
-                maxImages={5}
-              />
+              <ImageUploader images={images} onChange={setImages} maxImages={5} />
             </CardContent>
           </Card>
         </div>
       </div>
     </div>
-  );
-};
-
-export default EditProduct;
+  )
+}

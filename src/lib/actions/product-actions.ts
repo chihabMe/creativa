@@ -3,7 +3,7 @@ import { z } from "zod"
 import { revalidatePath, revalidateTag } from "next/cache"
 import { adminAction } from "@/lib/actions/safe-action"
 import { db } from "@/lib/db"
-import { products } from "@/lib/db/schema"
+import { productCategories, products } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
 import slugify from "slugify"
 import { CACHE_TAGS } from "@/lib/data"
@@ -17,7 +17,7 @@ const createProductSchema = z.object({
   badge: z.enum(["none", "new", "bestseller", "sale"]).default("none"),
   featured: z.boolean().default(false),
   images: z.array(z.string()).default([]),
-  categories: z.array(z.string()).default([]),
+  categoryIds: z.array(z.string()).default([]),
   sizes: z
     .array(
       z.object({
@@ -47,18 +47,35 @@ const deleteProductSchema = z.object({
 })
 
 // Create a new product
-export const createProduct = adminAction.schema(createProductSchema).action( async ({parsedInput:{ name, featured, categories, ...data }}) => {
+export const createProduct = adminAction.schema(createProductSchema).action(async ({parsedInput:{ name, featured, categoryIds, ...data }}) => {
   try {
     // Generate a slug from the name
     const slug = slugify(name, { lower: true, strict: true })
 
     // Insert the product into the database
-    const result = await db.insert(products).values({
-      name,
-      slug,
-      featured,
-      categories,
-      ...data,
+    const result = await db.transaction(async (tx) => {
+      // Insert the product
+      const [product] = await tx
+        .insert(products)
+        .values({
+          name,
+          slug,
+          featured,
+          ...data,
+        })
+        .returning({ id: products.id })
+
+      // Insert product-category relationships
+      if (categoryIds.length > 0) {
+        await tx.insert(productCategories).values(
+          categoryIds.map((categoryId) => ({
+            productId: product.id,
+            categoryId,
+          })),
+        )
+      }
+
+      return product
     })
 
     // Revalidate cache tags
@@ -70,13 +87,13 @@ export const createProduct = adminAction.schema(createProductSchema).action( asy
     }
 
     // Revalidate the categories tag if categories are provided
-    if (categories && categories.length > 0) {
+    if (categoryIds && categoryIds.length > 0) {
       revalidateTag(CACHE_TAGS.categories)
     }
 
     revalidatePath("/admin/products")
     revalidatePath("/")
-    revalidatePath("/category/[category]", "page")
+    revalidatePath("/category/[slug]", "page")
     revalidatePath("/products/[id]", "page")
 
     return { success: true, message: "Produit créé avec succès" }
@@ -86,8 +103,9 @@ export const createProduct = adminAction.schema(createProductSchema).action( asy
   }
 })
 
+
 // Update an existing product
-export const updateProduct = adminAction.schema(updateProductSchema).action( async ({parsedInput:{ id, name, featured, categories, ...data }}) => {
+export const updateProduct = adminAction.schema(updateProductSchema).action( async ({parsedInput:{ id, name, featured, categoryIds, ...data }}) => {
   try {
     // Get the current product to check if featured status changed
     const currentProduct = await db.query.products.findFirst({
@@ -98,17 +116,32 @@ export const updateProduct = adminAction.schema(updateProductSchema).action( asy
     const slug = slugify(name, { lower: true, strict: true })
 
     // Update the product in the database
-    await db
-      .update(products)
-      .set({
-        name,
-        slug,
-        featured,
-        categories,
-        ...data,
-        updatedAt: new Date(),
-      })
-      .where(eq(products.id, id))
+    await db.transaction(async (tx) => {
+      // Update the product
+      await tx
+        .update(products)
+        .set({
+          name,
+          slug,
+          featured,
+          ...data,
+          updatedAt: new Date(),
+        })
+        .where(eq(products.id, id))
+
+      // Delete existing product-category relationships
+      await tx.delete(productCategories).where(eq(productCategories.productId, id))
+
+      // Insert new product-category relationships
+      if (categoryIds.length > 0) {
+        await tx.insert(productCategories).values(
+          categoryIds.map((categoryId) => ({
+            productId: id,
+            categoryId,
+          })),
+        )
+      }
+    })
 
     // Revalidate cache tags
     revalidateTag(CACHE_TAGS.products)
@@ -119,13 +152,13 @@ export const updateProduct = adminAction.schema(updateProductSchema).action( asy
     }
 
     // Revalidate the categories tag if categories are provided or changed
-    if (categories && categories.length > 0) {
+    if (categoryIds && categoryIds.length > 0) {
       revalidateTag(CACHE_TAGS.categories)
     }
 
     revalidatePath("/admin/products")
     revalidatePath("/")
-    revalidatePath("/category/[category]", "page")
+    revalidatePath("/category/[slug]", "page")
     revalidatePath(`/products/${id}`)
 
     return { success: true, message: "Produit mis à jour avec succès" }
@@ -134,6 +167,7 @@ export const updateProduct = adminAction.schema(updateProductSchema).action( asy
     return { success: false, message: "Erreur lors de la mise à jour du produit" }
   }
 })
+
 
 // Delete a product
 export const deleteProduct = adminAction.schema(deleteProductSchema).action( async ({parsedInput:{ id }}) => {
@@ -144,6 +178,7 @@ export const deleteProduct = adminAction.schema(deleteProductSchema).action( asy
     })
 
     // Delete the product from the database
+    // Note: The product-category relationships will be automatically deleted due to the CASCADE constraint
     await db.delete(products).where(eq(products.id, id))
 
     // Revalidate cache tags
@@ -154,14 +189,12 @@ export const deleteProduct = adminAction.schema(deleteProductSchema).action( asy
       revalidateTag(CACHE_TAGS.featured)
     }
 
-    // If the product had categories, revalidate the categories tag
-    if (product && product.categories && product.categories.length > 0) {
-      revalidateTag(CACHE_TAGS.categories)
-    }
+    // Always revalidate the categories tag since we don't know which categories were associated
+    revalidateTag(CACHE_TAGS.categories)
 
     revalidatePath("/admin/products")
     revalidatePath("/")
-    revalidatePath("/category/[category]", "page")
+    revalidatePath("/category/[slug]", "page")
 
     return { success: true, message: "Produit supprimé avec succès" }
   } catch (error) {
@@ -173,14 +206,29 @@ export const deleteProduct = adminAction.schema(deleteProductSchema).action( asy
 // Get all products (for admin use - no caching)
 export async function getProducts() {
   try {
-    return await db.query.products.findMany({
+    const productsData = await db.query.products.findMany({
       orderBy: (products, { desc }) => [desc(products.createdAt)],
+      with: {
+        productCategories: {
+          with: {
+            category: true,
+          },
+        },
+      },
     })
+
+    // Transform the data to include category information
+    return productsData.map((product) => ({
+      ...product,
+      categories: product.productCategories.map((pc) => pc.category.slug),
+      categoryIds: product.productCategories.map((pc) => pc.category.id),
+    }))
   } catch (error) {
     console.error("Error fetching products:", error)
     return []
   }
 }
+
 export async function getAdminProducts({
   page = 1,
   pageSize = 10,
@@ -200,6 +248,13 @@ export async function getAdminProducts({
       orderBy: (products, { desc }) => [desc(products.createdAt)],
       limit: take,
       offset: skip,
+      with: {
+        productCategories: {
+          with: {
+            category: true,
+          },
+        },
+      },
     })
 
     return {
@@ -224,6 +279,13 @@ export async function getProductById(id: string) {
   try {
     return await db.query.products.findFirst({
       where: eq(products.id, id),
+      with: {
+        productCategories: {
+          with: {
+            category: true,
+          },
+        },
+      },
     })
   } catch (error) {
     console.error("Error fetching product:", error)

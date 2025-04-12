@@ -77,6 +77,13 @@ export const getProductById = unstable_cache(
     try {
       return await db.query.products.findFirst({
         where: eq(products.id, id),
+        with:{
+          productCategories: {
+            with: {
+              category: true,
+            },
+          },
+        }
       })
     } catch (error) {
       console.error(`Error fetching product by ID ${id}:`, error)
