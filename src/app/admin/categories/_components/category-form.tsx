@@ -31,11 +31,10 @@ type FormValues = z.infer<typeof formSchema>
 type Category = Awaited<ReturnType<typeof getCategories>>[0]
 interface CategoryFormProps {
   category: Category | null
-  categories: Category[]
   onClose: (success: boolean) => void
 }
 
-export default function CategoryForm({ category, categories, onClose }: CategoryFormProps) {
+export default function CategoryForm({ category,  onClose }: CategoryFormProps) {
   const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
 

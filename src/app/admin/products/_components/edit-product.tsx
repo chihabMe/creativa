@@ -24,7 +24,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { Plus, X } from "lucide-react";
-import type { getProductById } from "@/lib/data";
+import { getProductById } from "@/lib/actions/product-actions";
 import type React from "react";
 import { updateProduct } from "@/lib/actions/product-actions";
 import { getCategories } from "@/lib/actions/ category-actions";

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import CategoryForm from "./category-form"
 import { deleteCategory, getCategories } from "@/lib/actions/ category-actions"
+import { useRouter } from "next/navigation"
 
 
 type Category = Awaited<ReturnType<typeof getCategories>>[0]
@@ -27,6 +28,7 @@ interface CategoriesListProps {
 
 export default function CategoriesList({ categories }: CategoriesListProps) {
   const { toast } = useToast()
+  const router = useRouter()
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false)
@@ -77,7 +79,8 @@ export default function CategoriesList({ categories }: CategoriesListProps) {
 
     if (success) {
       // Refresh the page to show updated data
-      window.location.reload()
+      router.push("/admin/categories")
+
     }
   }
 
@@ -191,7 +194,7 @@ export default function CategoriesList({ categories }: CategoriesListProps) {
                 : "Remplissez les détails pour créer une nouvelle catégorie."}
             </DialogDescription>
           </DialogHeader>
-          <CategoryForm category={categoryToEdit} categories={categories} onClose={handleFormClose} />
+          <CategoryForm category={categoryToEdit}  onClose={handleFormClose} />
         </DialogContent>
       </Dialog>
     </div>
