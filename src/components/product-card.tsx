@@ -86,7 +86,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -5 }}
     >
-      <Card className="overflow-hidden shadow-none border-none flex flex-col h-full">
+      <Card className="overflow-hidden   flex flex-col h-full">
         <div className="relative">
           <Link href={`/products/${product.slug}`}>
             <div className="relative aspect-square overflow-hidden">
