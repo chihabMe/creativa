@@ -11,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/contexts/cart-context"
 import ProductCard from "@/components/product-card"
-// import Script from "next/script"
 import Breadcrumb from "@/components/breadcrumb"
 import WishlistButton from "@/components/wishlist-button"
 import { useRecentlyViewedStore } from "@/lib/store/recently-viewed-store"
@@ -103,23 +102,18 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
     setQuantity(quantity + 1)
   }
 
-
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-4 md:py-8">
       <Breadcrumb
         items={[
           { label: (product.categories?.[0] || "Produits"), href: `/category/${product.categories?.[0] || ""}` },
           { label: product.name, href: `/products/${product.id}` },
         ]}
       />
-      {/* <Script
-        id={`product-jsonld-${product.id}`}
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: generateJsonLd(product) }}
-      /> */}
-      <div className="mb-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+      
+      <div className="mb-8 grid grid-cols-1 gap-4 md:gap-8 lg:grid-cols-2">
         {/* Product Images */}
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           <motion.div
             className="relative aspect-square overflow-hidden rounded-lg border"
             initial={{ opacity: 0 }}
@@ -134,11 +128,11 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
               priority
             />
           </motion.div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {product.images?.map((img, index) => (
               <motion.div
                 key={index}
-                className={`relative h-20 w-20 cursor-pointer overflow-hidden rounded-md border ${
+                className={`relative h-16 w-16 sm:h-20 sm:w-20 cursor-pointer overflow-hidden rounded-md border ${
                   selectedImage === img ? "ring-2 ring-black" : ""
                 }`}
                 whileHover={{ scale: 1.05 }}
@@ -152,25 +146,24 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
         </div>
 
         {/* Product Info */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <h1 className="text-3xl font-bold">{product.name}</h1>
-            <div className="mt-2 flex gap-2">
+            <h1 className="text-2xl sm:text-3xl font-bold">{product.name}</h1>
+            <div className="mt-2 flex flex-wrap gap-2">
               {product.categories?.map((category) => (
                 <Link
                   key={category}
                   href={`/category/${category.toLowerCase()}`}
-                  className="text-sm text-gray-500 hover:text-black hover:underline"
+                  className="text-xs sm:text-sm text-gray-500 hover:text-black hover:underline"
                 >
                   {category}
                 </Link>
               ))}
             </div>
             <div className="mt-2 inline-block">
-
               <StockBadge stock={product.stock} />
             </div>
-            <p className="mt-4 text-2xl font-semibold">{finalPrice} DA</p>
+            <p className="mt-3 text-xl sm:text-2xl font-semibold">{finalPrice} DA</p>
           </motion.div>
 
           <div className="space-y-4">
@@ -180,43 +173,43 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                 <RadioGroup
                   value={selectedSize}
                   onValueChange={setSelectedSize}
-                  className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+                  className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4"
                 >
-                    {product.sizes.map((size) => (
+                  {product.sizes.map((size) => (
                     <div key={size.size} className="flex items-center space-x-2">
                       <RadioGroupItem value={size.size} id={`size-${size.size}`} className="peer sr-only" />
                       <Label
-                      htmlFor={`size-${size.size}`}
-                      className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                        htmlFor={`size-${size.size}`}
+                        className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                       >
-                      {size.size}
+                        {size.size}
                       </Label>
                     </div>
-                    ))}
+                  ))}
                 </RadioGroup>
               </div>
             )}
 
             {product.frames && product.frames.length > 0 && (
               <div>
-              <h3 className="mb-2 font-medium">Encadrement</h3>
-              <RadioGroup
-                value={selectedFrame}
-                onValueChange={setSelectedFrame}
-                className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-              >
-                {product.frames.map((frame) => (
-                <div key={frame.frame} className="flex items-center space-x-2">
-                  <RadioGroupItem value={frame.frame} id={`frame-${frame.frame}`} className="peer sr-only" />
-                  <Label
-                  htmlFor={`frame-${frame.frame}`}
-                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-400 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
-                  >
-                  {frame.frame}
-                  </Label>
-                </div>
-                ))}
-              </RadioGroup>
+                <h3 className="mb-2 font-medium">Encadrement</h3>
+                <RadioGroup
+                  value={selectedFrame}
+                  onValueChange={setSelectedFrame}
+                  className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+                >
+                  {product.frames.map((frame) => (
+                    <div key={frame.frame} className="flex items-center space-x-2">
+                      <RadioGroupItem value={frame.frame} id={`frame-${frame.frame}`} className="peer sr-only" />
+                      <Label
+                        htmlFor={`frame-${frame.frame}`}
+                        className="flex w-full cursor-pointer items-center h-12 justify-center rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-400 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                      >
+                        {frame.frame}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
               </div>
             )}
 
@@ -233,9 +226,9 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 pt-4 sm:flex-row">
+            <div className="flex flex-col gap-2 pt-3 sm:flex-row sm:items-stretch">
               <Button
-                className="w-full md:w-1/3 h-12 bg-emerald-600  hover:bg-emerald-700"
+                className="w-full sm:w-auto sm:flex-1 md:w-1/3 h-12 bg-emerald-600 hover:bg-emerald-700"
                 size="lg"
                 onClick={handleBuyNow}
                 disabled={product.stock <= 0}
@@ -250,8 +243,9 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                   onClick={handleAddToCart}
                   disabled={product.stock <= 0}
                 >
-                  <ShoppingCart className="mr-2 h-4 w-4" />
-                  {product.stock <= 0 ? "Indisponible" : "Ajouter au panier"}
+                  <ShoppingCart className="mr-1 h-4 w-4" />
+                  <span className="hidden sm:inline mr-1">Ajouter au panier</span>
+                  <span className="sm:hidden">Panier</span>
                 </Button>
                 <WishlistButton
                   productId={product.id}
@@ -264,17 +258,16 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
           </div>
 
           {product.description && (
-            <div className="pt-4">
-              <h3 className="mb-2 font-medium">Description</h3>
-              <p className="text-gray-700">{product.description}</p>
+            <div className="pt-2 md:pt-4">
+              <h3 className="mb-1 md:mb-2 font-medium">Description</h3>
+              <p className="text-sm md:text-base text-gray-700">{product.description}</p>
             </div>
           )}
 
-          <div className="pt-4">
+          <div className="pt-2 md:pt-4">
             <SocialShare
               url={`https://creativadeco.com/products/${product.slug}`}
               title={product.name}
-              // description={product.description || undefined}
             />
           </div>
         </div>
@@ -282,16 +275,16 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
 
       {/* Related Products */}
       {relatedProducts.length > 0 && (
-        <section className="mt-16">
+        <section className="mt-10 md:mt-16">
           <motion.h2
-            className="mb-8 text-center text-2xl font-bold"
+            className="mb-4 md:mb-8 text-center text-xl md:text-2xl font-bold"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             Vous pourriez aussi aimer
           </motion.h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 md:gap-6 md:grid-cols-3 lg:grid-cols-4">
             {relatedProducts.map((product, index) => (
               <ProductCard key={product.id} product={product} index={index} />
             ))}
