@@ -91,12 +91,13 @@ export default function ProductCard({ product, index }: ProductCardProps) {
           <Link href={`/products/${product.slug}`}>
             <div className="relative aspect-square overflow-hidden" style={{ width: "100%", height: "300px" }}>
               <Image
-                src={(product.images?.[0]) || "/placeholder.svg"}
-                className="object-center transition-transform duration-300 hover:scale-105"
-                width={300}
-                height={300}
-                alt={product.name}
-                style={{ width: "100%", height: "100%" }}
+              src={(product.images?.[0]) || "/placeholder.svg"}
+              className="object-center transition-transform duration-300 hover:scale-105"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 300px"
+              width={300}
+              height={300}
+              alt={product.name}
+              style={{ width: "100%", height: "100%" }}
               />
             </div>
           </Link>
