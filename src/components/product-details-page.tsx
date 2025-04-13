@@ -210,7 +210,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
                   <RadioGroupItem value={frame.frame} id={`frame-${frame.frame}`} className="peer sr-only" />
                   <Label
                   htmlFor={`frame-${frame.frame}`}
-                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-800 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                  className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-400 px-3 py-2 text-center text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                   >
                   {frame.frame}
                   </Label>
