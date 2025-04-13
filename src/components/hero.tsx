@@ -10,7 +10,7 @@ export default function Hero() {
         <p className="text-sm">Sublimez votre intérieur avec nos magnifiques tableaux ✨</p>
       </div> */}
 
-      <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[500px]">
+      <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[600px]">
         {/* Background image */}
         <Image src="/images/hero.png" alt="Creativa Deco Store Front" fill priority className="object-cover" />
 

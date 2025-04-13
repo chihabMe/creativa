@@ -1,7 +1,8 @@
 import { db } from "@/lib/db"
-import { products } from "@/lib/db/schema"
+import { products, categories, productCategories } from "@/lib/db/schema"
 import { faker } from "@faker-js/faker"
 import dotenv from "dotenv"
+import { v4 as uuidv4 } from "uuid"
 dotenv.config()
 
 // Helper functions for product generation
@@ -45,64 +46,167 @@ const generateFrames = () => {
   }))
 }
 
-const generateCategories = () => {
-  const categories = [
-    "portraits", "abstract", "landscape", "modern", 
-    "classic", "photography", "illustration", 
-    "vintage", "posters", "minimalist", "contemporary"
-  ]
+const generateBadge = (): "none" | "new" | "bestseller" | "sale" => {
+  const badges: ("none" | "new" | "bestseller" | "sale")[] = ["none", "new", "bestseller", "sale"]
+  const weights = [0.4, 0.2, 0.2, 0.2] // 40% none, 20% new, 20% bestseller, 20% sale
   
-  return faker.helpers.arrayElements(categories, faker.number.int({ min: 1, max: 3 }))
-}
-
-const generateBadge = (): "new" | "bestseller" | "none" | "sale" => {
-  const weights = [0.2, 0.2, 0.4, 0.2] // 20% new, 20% bestseller, 40% none, 20% sale
-  const options = ["new", "bestseller", "none", "sale"] as const
-  const weightedIndex = faker.number.int({ min: 0, max: weights.length - 1 })
-  return options[weightedIndex]
+  const random = Math.random()
+  let sum = 0
+  for (let i = 0; i < weights.length; i++) {
+    sum += weights[i]
+    if (random < sum) return badges[i]
+  }
+  return "none"
 }
 
 const generateImages = () => {
-  const count = faker.number.int({ min: 1, max: 3 })
+  const count = faker.number.int({ min: 2, max: 5 }) // Generate between 2 and 5 images
   return Array.from({ length: count }, () => 
-    faker.image.urlLoremFlickr({ category: 'art' }))
+    faker.image.urlPicsumPhotos({ width: 800, height: 600 }) 
+  )
 }
 
-async function seedProducts() {
+async function seedDatabase() {
   try {
+    // Clear existing data (optional)
+    await db.delete(productCategories)
+    await db.delete(products)
+    await db.delete(categories)
+    
+    console.log("Existing data cleared.")
 
-    // Generate 20 random products
-    const productCount = 30
-    const sampleProducts = Array.from({ length: productCount }, () => {
+    // Define category groups
+    const categoryGroups = [
+      {
+        groupName: "Modèles",
+        categories: [
+          { name: "Portraits", description: "Beautiful portrait artwork" },
+          { name: "Figures", description: "Artistic figure studies" },
+          { name: "Silhouettes", description: "Elegant silhouette designs" }
+        ]
+      },
+      {
+        groupName: "Styles",
+        categories: [
+          { name: "Abstract", description: "Modern abstract artwork" },
+          { name: "Minimalist", description: "Clean minimalist designs" },
+          { name: "Contemporary", description: "Contemporary art pieces" },
+          { name: "Vintage", description: "Classic vintage-inspired artwork" },
+          { name: "Watercolor", description: "Delicate watercolor paintings" }
+        ]
+      },
+      {
+        groupName: "Catégories",
+        categories: [
+          { name: "Landscape", description: "Beautiful landscape paintings" },
+          { name: "Nature", description: "Nature-inspired artwork" },
+          { name: "Urban", description: "City and urban scenes" },
+          { name: "Photography", description: "Fine art photography" },
+          { name: "Illustration", description: "Hand-drawn illustrations" }
+        ]
+      }
+    ]
+
+    // Prepare categories for insertion with UUIDs
+    const categoryData: {
+      id: string
+      name: string
+      slug: string
+      description: string
+      featured: boolean
+      displayOrder: number
+      groupName: string
+      createdAt: Date
+      updatedAt: Date
+    }[] = []
+    const categoryMap = new Map() // To store category id by name for later use
+    let displayOrder = 0
+
+    categoryGroups.forEach(group => {
+      group.categories.forEach(category => {
+        const categoryId = uuidv4()
+        categoryMap.set(category.name, categoryId)
+        
+        categoryData.push({
+          id: categoryId,
+          name: category.name,
+          slug: faker.helpers.slugify(category.name).toLowerCase(),
+          description: category.description,
+          featured: faker.datatype.boolean({ probability: 0.2 }),
+          displayOrder: displayOrder++,
+          groupName: group.groupName,
+          createdAt: faker.date.past({ years: 1 }),
+          updatedAt: faker.date.recent({ days: 30 }),
+        })
+      })
+    })
+
+    // Insert all categories
+    await db.insert(categories).values(categoryData)
+    console.log(`Successfully seeded ${categoryData.length} categories.`)
+
+    // Generate products
+    const productCount = 150
+    const productData = []
+    const productCategoryRelations: { productId: string; categoryId: string }[] = []
+
+    for (let i = 0; i < productCount; i++) {
+      const productId = uuidv4()
       const name = faker.commerce.productName()
       const basePrice = faker.number.int({ min: 1500, max: 5000 })
       
-      return {
+      // Create product
+      productData.push({
+        id: productId,
         name,
-        slug: faker.helpers.slugify(name).toLowerCase(),
+        slug: faker.helpers.slugify(`${name}-${basePrice}`).toLowerCase(),
         description: faker.lorem.paragraph(),
         price: basePrice,
         stock: faker.number.int({ min: 5, max: 100 }),
         badge: generateBadge(),
         featured: faker.datatype.boolean({ probability: 0.3 }),
         images: generateImages(),
-        categories: generateCategories(),
         sizes: generateSizes(),
         frames: generateFrames(),
         createdAt: faker.date.past({ years: 1 }),
         updatedAt: faker.date.recent({ days: 30 }),
-      }
-    })
+      })
+      
+      // Create product-category relationships
+      // Randomly assign 1-3 categories to each product
+      const categoryCount = faker.number.int({ min: 1, max: 3 })
+      const allCategoryNames = Array.from(categoryMap.keys())
+      const selectedCategories = faker.helpers.arrayElements(allCategoryNames, categoryCount)
+      
+      selectedCategories.forEach(categoryName => {
+        const categoryId = categoryMap.get(categoryName)
+        productCategoryRelations.push({
+          productId,
+          categoryId
+        })
+      })
+    }
 
-    // Insert all generated products
-    await db.insert(products).values(sampleProducts)
+    // Insert all products
+    await db.insert(products).values(productData)
+    
+    // Insert product-category relationships
+    if (productCategoryRelations.length > 0) {
+      await db.insert(productCategories).values(productCategoryRelations)
+    }
 
-    console.log(`Successfully seeded ${productCount} products.`)
+    console.log(`Successfully seeded ${productCount} products with ${productCategoryRelations.length} category relationships.`)
+    console.log("Database seeding completed successfully.")
     process.exit(0)
   } catch (error) {
-    console.error("Error seeding products:", error)
+    console.error("Error seeding database:", error)
+    if (error instanceof Error) {
+      console.error(error.stack)
+    } else {
+      console.error("An unknown error occurred:", error)
+    }
     process.exit(1)
   }
 }
 
-seedProducts()
+seedDatabase()
