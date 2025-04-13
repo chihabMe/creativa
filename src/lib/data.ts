@@ -2,7 +2,7 @@
 import { unstable_cache } from "next/cache"
 import { db } from "@/lib/db"
 import { products, categories, productCategories, orders, users } from "@/lib/db/schema"
-import { eq, like, desc, sql, and, sum, gte, count, lt } from "drizzle-orm"
+import { eq, like, desc, sql, and, sum, gte, count, lt, inArray } from "drizzle-orm"
 import { CACHE_TAGS } from "./constants";
 
 
@@ -292,12 +292,12 @@ export const getAllCategories = unstable_cache(
 
 // Get products by IDs with caching
 export const getProductsByIds = unstable_cache(
-  async (ids: number[]) => {
+  async (ids: string[]) => {
     try {
       if (ids.length === 0) return []
 
       const productsData = await db.query.products.findMany({
-        where: sql`${products.id} IN (${ids.join(",")})`,
+        where: inArray(products.id, ids),
         with: {
           productCategories: {
             with: {

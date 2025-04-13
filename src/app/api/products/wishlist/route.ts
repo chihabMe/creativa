@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const ids = idsParam.split(",")
+    console.log(ids)
     const products = await getProductsByIds(ids)
+    console.log("---------",products)
 
     return NextResponse.json(products)
   } catch (error) {
