@@ -48,7 +48,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
       whileHover={{ y: -5 }}
       className="w-full h-full"
     >
-      <Card className="overflow-hidden flex flex-col h-full">
+      <Card className="overflow-hidden rounded-none border-none shadow-none flex flex-col h-full">
         <div className="relative w-full">
           <Link href={`/products/${product.slug}`} className="block w-full">
             <div className="relative aspect-square overflow-hidden w-full">
@@ -72,7 +72,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
             </div>
           )}
         </div>
-        <CardContent className="p-4 flex-grow">
+        <CardContent className="px-1  py-2 flex-grow">
           <Link href={`/products/${product.slug}`}>
             <h3 
               className="mb-1 text-sm text-center font-medium overflow-hidden text-ellipsis line-clamp-2 h-auto " 
@@ -89,7 +89,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
             </div>
           )}
         </CardContent>
-        <CardFooter className="flex items-center justify-between p-4 pt-0">
+        <CardFooter className="flex items-center justify-between py-2 px-2 pt-0">
           <span className="font-semibold text-base md:text-lg">{product.price} DA</span>
 
           <div className="flex items-center gap-2">
