@@ -72,7 +72,9 @@ export default async function Home() {
         <Hero />
         <ProductGrid products={featuredProducts} title="Nouveauté" />
         {productsForEachCategory.map((item) => (
-          <ProductGrid products={item.products} title={item.name} />
+          item.products.length > 0 && (
+            <ProductGrid products={item.products} title={item.name} />
+          )
         ))}
         <Features />
         <HomeJsonLd />
