@@ -235,7 +235,7 @@ export default function ProductDetailsPage({ product, relatedProducts }: Product
 
             <div className="flex flex-col gap-2 pt-4 sm:flex-row">
               <Button
-                className="md:w-1/3 h-12 bg-emerald-600  hover:bg-emerald-700"
+                className="w-full md:w-1/3 h-12 bg-emerald-600  hover:bg-emerald-700"
                 size="lg"
                 onClick={handleBuyNow}
                 disabled={product.stock <= 0}

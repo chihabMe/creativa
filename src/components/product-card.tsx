@@ -75,7 +75,7 @@ export default function ProductCard({ product, index }: ProductCardProps) {
         <CardContent className="p-4 flex-grow">
           <Link href={`/products/${product.slug}`}>
             <h3 
-              className="mb-1 text-center font-medium overflow-hidden text-ellipsis line-clamp-2 h-auto min-h-12" 
+              className="mb-1 text-sm text-center font-medium overflow-hidden text-ellipsis line-clamp-2 h-auto " 
               title={product.name}
             >
               {product.name}
