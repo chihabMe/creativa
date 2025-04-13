@@ -43,11 +43,6 @@ export default function MobileMenu({ featuredCategories, groupedCategories, incl
         <SheetHeader className="p-4 border-b">
           <SheetTitle className="flex justify-between items-center">
             Menu
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon">
-                <X className="h-5 w-5" />
-              </Button>
-            </SheetClose>
           </SheetTitle>
         </SheetHeader>
 
