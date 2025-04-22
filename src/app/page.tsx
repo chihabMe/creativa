@@ -70,7 +70,7 @@ export default async function Home() {
         <ProductGrid products={featuredProducts} title="Nouveauté" />
         {productsForEachCategory.map((item) => (
           item.products.length > 0 && (
-            <ProductGrid products={item.products} title={item.name} />
+            <ProductGrid key={`grid_${item.id}`} products={item.products} title={item.name} />
           )
         ))}
         <Features />

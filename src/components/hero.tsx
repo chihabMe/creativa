@@ -1,7 +1,5 @@
-"use client"
-
-import Image from "next/image"
-import * as motion from "motion/react-m"
+import Image from "next/image";
+import * as motion from "motion/react-m";
 
 export default function Hero() {
   return (
@@ -10,10 +8,20 @@ export default function Hero() {
         <p className="text-sm">Sublimez votre intérieur avec nos magnifiques tableaux ✨</p>
       </div> */}
 
-      <div className="relative h-[300px] w-full overflow-hidden sm:h-[400px] md:h-[600px]">
-        {/* Background image */}
-        <Image src="/images/hero.png" alt="Creativa Deco Store Front" fill priority className="object-cover" />
-
+      <div className="relative h-72 w-full overflow-hidden sm:h-96 md:h-[600px]">
+        {/* Background image with optimizations */}
+        <Image
+          src="/images/hero.png"
+          alt="Creativa Deco Store Front"
+          fill
+          priority
+          quality={75}
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+          sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
+          className="object-cover"
+          loading="eager"
+        />
         {/* Gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
       </div>
@@ -47,18 +55,20 @@ export default function Hero() {
           animate={{ opacity: 1 }}
           transition={{ delay: 1.5, duration: 1 }}
         >
-          {Array.from("Décorez votre intérieur avec style").map((char, index) => (
-            <motion.span
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.5 + index * 0.03, duration: 0.3 }}
-            >
-              {char}
-            </motion.span>
-          ))}
+          {Array.from("Décorez votre intérieur avec style").map(
+            (char, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1.5 + index * 0.03, duration: 0.3 }}
+              >
+                {char}
+              </motion.span>
+            )
+          )}
         </motion.p>
       </motion.div>
     </section>
-  )
+  );
 }
