@@ -11,16 +11,11 @@ export default function Hero() {
       <div className="relative h-72 w-full overflow-hidden sm:h-96 md:h-[600px]">
         {/* Background image with optimizations */}
         <Image
-          src="/images/hero.png"
-          alt="Creativa Deco Store Front"
+        quality={0}
+          src="/images/hero.webp"
           fill
-          priority
-          quality={75}
-          placeholder="blur"
-          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 100vw, 100vw"
-          className="object-cover"
-          loading="eager"
+          className="object-cover object-center"
+          alt="hi"
         />
         {/* Gradient overlay for better text visibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent"></div>
