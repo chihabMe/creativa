@@ -2,7 +2,7 @@ import type React from "react";
 import "./globals.css";
 // import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster";
-import { auth } from "@/lib/auth";
+// import { auth } from "@/lib/auth";
 import Providers from "@/components/providers";
 // import RouteProgressBar from "@/components/route-progress-bar";
 
@@ -13,11 +13,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
+  // const session = await auth();
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className="">
-        <Providers session={session} >
+        <Providers >
             {children}
                     <Toaster />
         </Providers>

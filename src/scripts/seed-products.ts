@@ -234,7 +234,7 @@ async function seedDatabase() {
     console.log(`Successfully seeded ${categoryData.length} categories.`);
 
     // Generate products
-    const productCount = 4;
+    const productCount = 20;
     const productData = [];
     const productCategoryRelations: {
       productId: string;

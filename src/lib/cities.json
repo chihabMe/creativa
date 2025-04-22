@@ -1,0 +1,122 @@
+[
+  {
+    "code": 1,
+    "name": "Adrar",
+    "communes": [
+      "Adrar",
+      "Reggane",
+      "Timimoun",
+      "Zaouiet Kounta"
+    ]
+  },
+  {
+    "code": 2,
+    "name": "Chlef",
+    "communes": [
+      "Chlef",
+      "Tenes",
+      "Boukadir",
+      "Oued Fodda"
+    ]
+  },
+  {
+    "code": 3,
+    "name": "Laghouat",
+    "communes": [
+      "Laghouat",
+      "Aflou",
+      "Brida",
+      "Ksar El Hirane"
+    ]
+  },
+  {
+    "code": 4,
+    "name": "Oum El Bouaghi",
+    "communes": [
+      "Oum El Bouaghi",
+      "Ain Beida",
+      "Fkirina",
+      "Ain M'lila"
+    ]
+  },
+  {
+    "code": 5,
+    "name": "Batna",
+    "communes": [
+      "Batna",
+      "Arris",
+      "Barika",
+      "Timgad"
+    ]
+  },
+  {
+    "code": 6,
+    "name": "Béjaïa",
+    "communes": [
+      "Béjaïa",
+      "El Kseur",
+      "Sidi Aïch",
+      "Amizour"
+    ]
+  },
+  {
+    "code": 7,
+    "name": "Biskra",
+    "communes": [
+      "Biskra",
+      "Tolga",
+      "El Kantara",
+      "Ourlal"
+    ]
+  },
+  {
+    "code": 8,
+    "name": "Béchar",
+    "communes": [
+      "Béchar",
+      "Kenadsa",
+      "Taghit",
+      "Beni Ounif"
+    ]
+  },
+  {
+    "code": 9,
+    "name": "Blida",
+    "communes": [
+      "Blida",
+      "Boufarik",
+      "Bougara",
+      "Mouzaïa"
+    ]
+  },
+  {
+    "code": 10,
+    "name": "Bouira",
+    "communes": [
+      "Bouira",
+      "Sour El Ghozlane",
+      "Aïn Bessem",
+      "Haizer"
+    ]
+  },
+  {
+    "code": 16,
+    "name": "Alger",
+    "communes": [
+      "Bab El Oued",
+      "El Madania",
+      "Bir Mourad Raïs",
+      "Hussein Dey"
+    ]
+  },
+  {
+    "code": 31,
+    "name": "Oran",
+    "communes": [
+      "Oran",
+      "Bir El Djir",
+      "Es Senia",
+      "Aïn El Turk"
+    ]
+  }
+]

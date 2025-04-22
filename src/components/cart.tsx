@@ -43,6 +43,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/cart-context";
 import { createOrder } from "@/lib/actions/order-actions";
 
+
+
 // Wilaya options for Algeria
 const wilayaOptions = [
   { value: "1", label: "1 - Adrar" },
@@ -235,8 +237,6 @@ export default function Cart() {
     commune: "",
     address: "",
     note: "",
-    promoCode: "",
-    acceptTerms: false,
   });
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -257,18 +257,18 @@ export default function Cart() {
     }
   };
 
-  const handleCheckboxChange = (checked: boolean) => {
-    setFormData((prev) => ({ ...prev, acceptTerms: checked }));
+  // const handleCheckboxChange = (checked: boolean) => {
+  //   setFormData((prev) => ({ ...prev}));
 
-    // Clear error when field is edited
-    if (formErrors.acceptTerms) {
-      setFormErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors.acceptTerms;
-        return newErrors;
-      });
-    }
-  };
+  //   // Clear error when field is edited
+  //   if (formErrors.acceptTerms) {
+  //     setFormErrors((prev) => {
+  //       const newErrors = { ...prev };
+  //       delete newErrors.acceptTerms;
+  //       return newErrors;
+  //     });
+  //   }
+  // };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -309,8 +309,8 @@ export default function Cart() {
   const validatePaymentForm = () => {
     const errors: Record<string, string> = {};
 
-    if (!formData.acceptTerms)
-      errors.acceptTerms = "Vous devez accepter les conditions générales";
+    // if (!formData.acceptTerms)
+    //   errors.acceptTerms = "Vous devez accepter les conditions générales";
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
@@ -645,10 +645,10 @@ export default function Cart() {
                           <span>Sous-total</span>
                           <span>{totalPrice} DA</span>
                         </div>
-                        <div className="flex justify-between">
+                        {/* <div className="flex justify-between">
                           <span>Livraison</span>
                           <span>0 DA</span>
-                        </div>
+                        </div> */}
                         <motion.div
                           className="flex justify-between border-t pt-2 font-semibold"
                           initial={{ opacity: 0, y: 10 }}
@@ -934,32 +934,6 @@ export default function Cart() {
                     </motion.div>
                   </motion.div>
 
-                  <motion.div variants={fadeInUp} transition={{ delay: 0.2 }}>
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="promo">Code promo</Label>
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 text-xs"
-                        >
-                          APPLIQUER
-                        </Button>
-                      </motion.div>
-                    </div>
-                    <Input
-                      id="promo"
-                      name="promoCode"
-                      value={formData.promoCode}
-                      onChange={handleInputChange}
-                      placeholder="Code promo"
-                      className="mt-2"
-                    />
-                  </motion.div>
-
                   <motion.div variants={fadeInUp} transition={{ delay: 0.3 }}>
                     <h3 className="mb-4 text-lg font-medium">Paiement</h3>
                     <RadioGroup defaultValue="cash" className="space-y-4">
@@ -1005,13 +979,13 @@ export default function Cart() {
                       <span>Réduction</span>
                       <span>0 DA</span>
                     </motion.div>
-                    <motion.div
+                    {/* <motion.div
                       className="flex justify-between"
                       variants={itemFadeIn}
                     >
                       <span>Livraison</span>
                       <span>0 DA</span>
-                    </motion.div>
+                    </motion.div> */}
                     <motion.div
                       className="flex justify-between border-t pt-2 font-semibold"
                       variants={fadeInUp}
@@ -1030,7 +1004,7 @@ export default function Cart() {
                     </motion.div>
                   </motion.div>
 
-                  <motion.div
+                  {/* <motion.div
                     className="flex items-center space-x-2"
                     variants={fadeInUp}
                     transition={{ delay: 0.7 }}
@@ -1052,7 +1026,7 @@ export default function Cart() {
                     <p className="mt-1 text-xs text-red-500">
                       {formErrors.acceptTerms}
                     </p>
-                  )}
+                  )} */}
                 </motion.div>
               )}
 
@@ -1237,7 +1211,7 @@ export default function Cart() {
                   <Button
                     className="w-full bg-emerald-600 hover:bg-emerald-700 transition-all duration-300"
                     onClick={handleSubmitOrder}
-                    disabled={isSubmitting || !formData.acceptTerms}
+                    disabled={isSubmitting }
                   >
                     {isSubmitting ? (
                       <motion.div

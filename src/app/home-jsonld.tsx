@@ -7,8 +7,8 @@ export default function HomeJsonLd() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "CRÉATIVA DÉCO",
-    url: "https://creativadeco.com",
-    logo: "https://creativadeco.com/logo.svg",
+    url: `https://${process.env.NEXT_PUBLIC_HOST}`,
+    logo: `https://${process.env.NEXT_PUBLIC_HOST}/logo.svg`,
     contactPoint: {
       "@type": "ContactPoint",
       telephone: "05 52 79 66 95",

@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "CRÉATIVA DÉCO - Tableaux & Decoration d'Intérieur",
       description:
         "Sublimez votre intérieur avec nos magnifiques tableaux et décorations. Livraison dans toute l'Algérie.",
-      url: "https://creativadeco.com",
+      url: `https:/${process.env.NEXT_PUBLIC_HOST}`,
       siteName: "CRÉATIVA DÉCO",
       images: [
         {
@@ -44,9 +44,6 @@ export async function generateMetadata(): Promise<Metadata> {
       description:
         "Sublimez votre intérieur avec nos magnifiques tableaux et décorations. Livraison dans toute l'Algérie.",
       images: ["/images/banner-1.jpg"],
-    },
-    alternates: {
-      canonical: "https://creativadeco.com",
     },
   };
 }
