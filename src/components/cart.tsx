@@ -43,8 +43,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/cart-context";
 import { createOrder } from "@/lib/actions/order-actions";
 
-
-
 // Wilaya options for Algeria
 const wilayaOptions = [
   { value: "1", label: "1 - Adrar" },
@@ -530,7 +528,9 @@ export default function Cart() {
                     >
                       {items.map((item, index) => (
                         <motion.div
-                          key={`${item.id}-${item.size}-${item.frame}`}
+                          key={`${item.id}-${item.size}-${item.frame}-${
+                            item.frameSubOption || ""
+                          }`}
                           className="flex gap-4 border-b pb-4"
                           variants={itemFadeIn}
                           custom={index}
@@ -581,6 +581,7 @@ export default function Cart() {
                             </div>
                             <p className="text-xs text-gray-500">
                               {item.size} / {item.frame}
+                              {item.frameSubOption ? ` / ${item.frameSubOption}` : ""}
                             </p>
                             <div className="mt-auto flex items-center justify-between">
                               <div className="flex items-center">
@@ -903,7 +904,9 @@ export default function Cart() {
                     >
                       {items.map((item, index) => (
                         <motion.div
-                          key={`${item.id}-${item.size}-${item.frame}`}
+                          key={`${item.id}-${item.size}-${item.frame}-${
+                            item.frameSubOption || ""
+                          }`}
                           className="flex justify-between border-b pb-2"
                           variants={itemFadeIn}
                           custom={index}
@@ -921,6 +924,7 @@ export default function Cart() {
                             <p className="font-medium">{item.name}</p>
                             <p className="text-xs text-gray-500">
                               {item.size} / {item.frame}
+                              {item.frameSubOption ? ` / ${item.frameSubOption}` : ""}
                             </p>
                             <p className="text-xs text-gray-500">
                               {item.price} DA x {item.quantity}
@@ -1211,7 +1215,7 @@ export default function Cart() {
                   <Button
                     className="w-full bg-emerald-600 hover:bg-emerald-700 transition-all duration-300"
                     onClick={handleSubmitOrder}
-                    disabled={isSubmitting }
+                    disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <motion.div

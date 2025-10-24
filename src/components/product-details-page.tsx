@@ -38,31 +38,58 @@ export default function ProductDetailsPage({
       ? product.frames[0].frame
       : "SANS"
   );
+
+  // Get the current frame's sub-options
+  const currentFrameSubOptions =
+    product.frames?.find((f) => f.frame === selectedFrame)?.subOptions || [];
+
+  const [selectedFrameSubOption, setSelectedFrameSubOption] = useState(
+    currentFrameSubOptions.length > 0 ? currentFrameSubOptions[0].name : ""
+  );
+
+  // Update selected sub-option when frame changes
+  useEffect(() => {
+    const newFrameSubOptions =
+      product.frames?.find((f) => f.frame === selectedFrame)?.subOptions || [];
+    if (newFrameSubOptions.length > 0) {
+      setSelectedFrameSubOption(newFrameSubOptions[0].name);
+    } else {
+      setSelectedFrameSubOption("");
+    }
+  }, [selectedFrame, product.frames]);
+
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(
     (product.images && product.images[0]) || ""
   );
   const { toast } = useToast();
-  const { addItem: addItemToCart, removeItem: removeItemFromCart, items: cartItems, openCart } = useCart();
+  const {
+    addItem: addItemToCart,
+    removeItem: removeItemFromCart,
+    items: cartItems,
+    openCart,
+  } = useCart();
   const { addItem } = useRecentlyViewedStore();
-  
+
   // Check if this product configuration is already in the cart
   const isInCart = () => {
     return cartItems.some(
-      (item) => 
-        item.id === product.id.toString() && 
-        item.size === selectedSize && 
-        item.frame === selectedFrame
+      (item) =>
+        item.id === product.id.toString() &&
+        item.size === selectedSize &&
+        item.frame === selectedFrame &&
+        item.frameSubOption === selectedFrameSubOption
     );
   };
-  
+
   // Get cart item if it exists
   const getCartItem = () => {
     return cartItems.find(
-      (item) => 
-        item.id === product.id.toString() && 
-        item.size === selectedSize && 
-        item.frame === selectedFrame
+      (item) =>
+        item.id === product.id.toString() &&
+        item.size === selectedSize &&
+        item.frame === selectedFrame &&
+        item.frameSubOption === selectedFrameSubOption
     );
   };
 
@@ -88,16 +115,37 @@ export default function ProductDetailsPage({
     return 0;
   };
 
+  const getSelectedFrameSubOptionPrice = () => {
+    if (product.frames && product.frames.length > 0) {
+      const frame = product.frames.find((f) => f.frame === selectedFrame);
+      if (frame && frame.subOptions && frame.subOptions.length > 0) {
+        const subOption = frame.subOptions.find(
+          (s) => s.name === selectedFrameSubOption
+        );
+        return subOption ? subOption.price : 0;
+      }
+    }
+    return 0;
+  };
+
   const finalPrice =
-    product.price + getSelectedSizePrice() + getSelectedFramePrice();
+    product.price +
+    getSelectedSizePrice() +
+    getSelectedFramePrice() +
+    getSelectedFrameSubOptionPrice();
 
   const handleAddToCart = () => {
     const existingItem = getCartItem();
-    
+
     if (existingItem) {
       // If the item is already in the cart, remove it
-      removeItemFromCart(existingItem.id, selectedSize, selectedFrame);
-      
+      removeItemFromCart(
+        existingItem.id,
+        selectedSize,
+        selectedFrame,
+        selectedFrameSubOption
+      );
+
       toast({
         title: "Produit retiré du panier",
         description: `${product.name} a été retiré de votre panier.`,
@@ -111,6 +159,7 @@ export default function ProductDetailsPage({
         quantity,
         size: selectedSize,
         frame: selectedFrame,
+        frameSubOption: selectedFrameSubOption,
         image: (product.images && product.images[0]) || "",
       });
 
@@ -130,6 +179,7 @@ export default function ProductDetailsPage({
       quantity,
       size: selectedSize,
       frame: selectedFrame,
+      frameSubOption: selectedFrameSubOption,
       image: (product.images && product.images[0]) || "",
     });
 
@@ -148,8 +198,14 @@ export default function ProductDetailsPage({
 
   // Determine the cart button state
   const cartItemExists = isInCart();
-  const cartButtonText = cartItemExists ? "Retirer du panier" : "Ajouter au panier";
-  const cartButtonIcon = cartItemExists ? <Trash2 className="mr-1 h-4 w-4" /> : <ShoppingCart className="mr-1 h-4 w-4" />;
+  const cartButtonText = cartItemExists
+    ? "Retirer du panier"
+    : "Ajouter au panier";
+  const cartButtonIcon = cartItemExists ? (
+    <Trash2 className="mr-1 h-4 w-4" />
+  ) : (
+    <ShoppingCart className="mr-1 h-4 w-4" />
+  );
   const cartButtonVariant = cartItemExists ? "destructive" : "outline";
 
   return (
@@ -252,9 +308,14 @@ export default function ProductDetailsPage({
                         />
                         <Label
                           htmlFor={`size-${size.size}`}
-                          className="flex w-full cursor-pointer items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                          className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
-                          {size.size}
+                          <span>{size.size}</span>
+                          {size.price > 0 && (
+                            <span className="text-[10px] sm:text-xs opacity-75">
+                              +{size.price.toLocaleString("fr-DZ")} DA
+                            </span>
+                          )}
                         </Label>
                       </div>
                     ))}
@@ -282,9 +343,49 @@ export default function ProductDetailsPage({
                         />
                         <Label
                           htmlFor={`frame-${frame.frame}`}
-                          className="flex w-full cursor-pointer items-center h-12 justify-center rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-400 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                          className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-400 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
-                          {frame.frame}
+                          <span>{frame.frame}</span>
+                          {frame.price > 0 && (
+                            <span className="font-semibold">
+                              +{frame.price.toLocaleString("fr-DZ")} DA
+                            </span>
+                          )}
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </div>
+              )}
+
+              {currentFrameSubOptions.length > 0 && (
+                <div>
+                  <h3 className="mb-2 font-medium">
+                    Options pour {selectedFrame}
+                  </h3>
+                  <RadioGroup
+                    value={selectedFrameSubOption}
+                    onValueChange={setSelectedFrameSubOption}
+                    className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+                  >
+                    {currentFrameSubOptions.map((subOption) => (
+                      <div
+                        key={subOption.name}
+                        className="flex items-center space-x-2"
+                      >
+                        <RadioGroupItem
+                          value={subOption.name}
+                          id={`framesuboption-${subOption.name}`}
+                          className="peer sr-only"
+                        />
+                        <Label
+                          htmlFor={`framesuboption-${subOption.name}`}
+                          className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
+                        >
+                          <span>{subOption.name}</span>
+                          <span className="font-semibold">
+                            +{subOption.price.toLocaleString("fr-DZ")} DA
+                          </span>
                         </Label>
                       </div>
                     ))}
@@ -325,14 +426,16 @@ export default function ProductDetailsPage({
                   disabled={product.stock <= 0}
                 >
                   {product.stock <= 0
-                  ? "Rupture de stock"
-                  : "J'achète maintenant"}
+                    ? "Rupture de stock"
+                    : "J'achète maintenant"}
                 </Button>
                 <div className="flex w-full gap-2">
                   <Button
                     variant={cartButtonVariant}
                     className={`flex-1 h-12 active:scale-95 transition-transform ${
-                      cartItemExists ? "bg-red-500 hover:bg-red-600 text-white" : ""
+                      cartItemExists
+                        ? "bg-red-500 hover:bg-red-600 text-white"
+                        : ""
                     }`}
                     size="lg"
                     onClick={handleAddToCart}
@@ -354,11 +457,13 @@ export default function ProductDetailsPage({
                   />
                 </div>
               </div>
-              
+
               {cartItemExists && (
                 <div className="flex items-center mt-2 text-sm text-emerald-600">
                   <Check className="h-4 w-4 mr-1" />
-                  <span>{getCartItem()?.quantity || quantity} dans votre panier</span>
+                  <span>
+                    {getCartItem()?.quantity || quantity} dans votre panier
+                  </span>
                 </div>
               )}
             </div>

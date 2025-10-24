@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import Link from "next/link"
-import { ArrowLeft, Package, Truck, CheckCircle, Clock } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import Image from "next/image";
+import Link from "next/link";
+import { ArrowLeft, Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface OrderDetailsProps {
-  order: any // Using any for simplicity, but you should define a proper type
+  order: any; // Using any for simplicity, but you should define a proper type
 }
 
 export default function OrderDetails({ order }: OrderDetailsProps) {
@@ -18,8 +18,8 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
       year: "numeric",
       month: "long",
       day: "numeric",
-    })
-  }
+    });
+  };
 
   // Get status badge
   const getStatusBadge = (status: string) => {
@@ -29,31 +29,31 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
           <Badge className="bg-emerald-500">
             <CheckCircle className="mr-1 h-3 w-3" /> Livré
           </Badge>
-        )
+        );
       case "processing":
         return (
           <Badge className="bg-blue-500">
             <Package className="mr-1 h-3 w-3" /> En cours
           </Badge>
-        )
+        );
       case "pending":
         return (
           <Badge className="bg-yellow-500">
             <Clock className="mr-1 h-3 w-3" /> En attente
           </Badge>
-        )
+        );
       case "shipped":
         return (
           <Badge className="bg-purple-500">
             <Truck className="mr-1 h-3 w-3" /> Expédié
           </Badge>
-        )
+        );
       case "cancelled":
-        return <Badge className="bg-red-500">Annulé</Badge>
+        return <Badge className="bg-red-500">Annulé</Badge>;
       default:
-        return <Badge>{status}</Badge>
+        return <Badge>{status}</Badge>;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -75,7 +75,9 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                 <CardTitle>Commande #{order.orderNumber}</CardTitle>
                 {getStatusBadge(order.status)}
               </div>
-              <p className="text-sm text-gray-500">Passée le {formatDate(order.createdAt)}</p>
+              <p className="text-sm text-gray-500">
+                Passée le {formatDate(order.createdAt)}
+              </p>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
@@ -83,7 +85,10 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                   <h3 className="mb-2 font-medium">Articles</h3>
                   <div className="space-y-4 rounded-md border p-4">
                     {order.orderItems.map((item: any) => (
-                      <div key={item.id} className="flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0">
+                      <div
+                        key={item.id}
+                        className="flex items-start gap-4 border-b pb-4 last:border-0 last:pb-0"
+                      >
                         <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-md">
                           <Image
                             src={item.product.images[0] || "/placeholder.svg"}
@@ -94,15 +99,21 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                         </div>
                         <div className="flex flex-1 flex-col">
                           <div className="flex justify-between">
-                            <Link href={`/products/${item.product.id}`} className="font-medium hover:underline">
+                            <Link
+                              href={`/products/${item.product.id}`}
+                              className="font-medium hover:underline"
+                            >
                               {item.product.name}
                             </Link>
                             <p className="font-medium">{item.price} DA</p>
                           </div>
                           <p className="text-sm text-gray-500">
                             {item.size} / {item.frame}
+                            {item.subOption ? ` / ${item.subOption}` : ""}
                           </p>
-                          <p className="text-sm text-gray-500">Quantité: {item.quantity}</p>
+                          <p className="text-sm text-gray-500">
+                            Quantité: {item.quantity}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -139,10 +150,12 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                   <span className="font-medium">Nom:</span> {order.customerName}
                 </p>
                 <p>
-                  <span className="font-medium">Email:</span> {order.customerEmail}
+                  <span className="font-medium">Email:</span>{" "}
+                  {order.customerEmail}
                 </p>
                 <p>
-                  <span className="font-medium">Téléphone:</span> {order.customerPhone}
+                  <span className="font-medium">Téléphone:</span>{" "}
+                  {order.customerPhone}
                 </p>
               </div>
             </CardContent>
@@ -184,5 +197,5 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

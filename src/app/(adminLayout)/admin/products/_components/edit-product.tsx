@@ -71,10 +71,21 @@ const EditProduct = ({ product, categories }: Props) => {
         price: size.price.toString(),
       })) || [],
     frames:
-      product.frames?.map((frame: { frame: string; price: number }) => ({
-        frame: frame.frame,
-        price: frame.price.toString(),
-      })) || [],
+      product.frames?.map(
+        (frame: {
+          frame: string;
+          price: number;
+          subOptions?: { name: string; price: number }[];
+        }) => ({
+          frame: frame.frame,
+          price: frame.price.toString(),
+          subOptions:
+            frame.subOptions?.map((subOption) => ({
+              name: subOption.name,
+              price: subOption.price.toString(),
+            })) || [],
+        })
+      ) || [],
   });
 
   const [images, setImages] =
@@ -130,7 +141,7 @@ const EditProduct = ({ product, categories }: Props) => {
   const handleAddFrame = () => {
     setFormData((prev) => ({
       ...prev,
-      frames: [...prev.frames, { frame: "", price: "" }],
+      frames: [...prev.frames, { frame: "", price: "", subOptions: [] }],
     }));
   };
 
@@ -149,6 +160,34 @@ const EditProduct = ({ product, categories }: Props) => {
       ...prev,
       frames: prev.frames.filter((_, i) => i !== index),
     }));
+  };
+
+  const handleAddSubOption = (frameIndex: number) => {
+    const newFrames = [...formData.frames];
+    newFrames[frameIndex].subOptions.push({ name: "", price: "" });
+    setFormData((prev) => ({ ...prev, frames: newFrames }));
+  };
+
+  const handleSubOptionChange = (
+    frameIndex: number,
+    subOptionIndex: number,
+    field: "name" | "price",
+    value: string
+  ) => {
+    const newFrames = [...formData.frames];
+    newFrames[frameIndex].subOptions[subOptionIndex][field] = value;
+    setFormData((prev) => ({ ...prev, frames: newFrames }));
+  };
+
+  const handleRemoveSubOption = (
+    frameIndex: number,
+    subOptionIndex: number
+  ) => {
+    const newFrames = [...formData.frames];
+    newFrames[frameIndex].subOptions = newFrames[frameIndex].subOptions.filter(
+      (_, i) => i !== subOptionIndex
+    );
+    setFormData((prev) => ({ ...prev, frames: newFrames }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -191,6 +230,10 @@ const EditProduct = ({ product, categories }: Props) => {
         frames: formData.frames.map((frame) => ({
           frame: frame.frame,
           price: Number(frame.price),
+          subOptions: frame.subOptions.map((subOption) => ({
+            name: subOption.name,
+            price: Number(subOption.price),
+          })),
         })),
       };
 
@@ -396,10 +439,146 @@ const EditProduct = ({ product, categories }: Props) => {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleRemoveFrame(index)}
+                            onClick={() => handleRemoveSize(index)}
                           >
                             <X className="h-4 w-4" />
                           </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label>Options d'encadrement</Label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddFrame}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Ajouter une option
+                    </Button>
+                  </div>
+
+                  {formData.frames.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Aucune option d'encadrement ajoutée.
+                    </p>
+                  ) : (
+                    <div className="space-y-4">
+                      {formData.frames.map((frame, frameIndex) => (
+                        <div
+                          key={frameIndex}
+                          className="border rounded-lg p-4 space-y-3"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Input
+                              value={frame.frame}
+                              onChange={(e) =>
+                                handleFrameChange(
+                                  frameIndex,
+                                  "frame",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="ex: SANS ENCADREMENT"
+                              className="flex-1"
+                            />
+                            <Input
+                              value={frame.price}
+                              onChange={(e) =>
+                                handleFrameChange(
+                                  frameIndex,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Supplément (DA)"
+                              type="number"
+                              className="w-32"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleRemoveFrame(frameIndex)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+
+                          {/* Sub-options section */}
+                          <div className="ml-4 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <Label className="text-sm text-muted-foreground">
+                                Sous-options
+                              </Label>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleAddSubOption(frameIndex)}
+                                type="button"
+                              >
+                                <Plus className="mr-1 h-3 w-3" />
+                                Ajouter une sous-option
+                              </Button>
+                            </div>
+
+                            {frame.subOptions.length > 0 && (
+                              <div className="space-y-2">
+                                {frame.subOptions.map(
+                                  (subOption, subOptionIndex) => (
+                                    <div
+                                      key={subOptionIndex}
+                                      className="flex items-center space-x-2"
+                                    >
+                                      <Input
+                                        value={subOption.name}
+                                        onChange={(e) =>
+                                          handleSubOptionChange(
+                                            frameIndex,
+                                            subOptionIndex,
+                                            "name",
+                                            e.target.value
+                                          )
+                                        }
+                                        placeholder="Nom de la sous-option"
+                                        className="flex-1"
+                                      />
+                                      <Input
+                                        value={subOption.price}
+                                        onChange={(e) =>
+                                          handleSubOptionChange(
+                                            frameIndex,
+                                            subOptionIndex,
+                                            "price",
+                                            e.target.value
+                                          )
+                                        }
+                                        placeholder="Prix (DA)"
+                                        type="number"
+                                        className="w-28"
+                                      />
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() =>
+                                          handleRemoveSubOption(
+                                            frameIndex,
+                                            subOptionIndex
+                                          )
+                                        }
+                                        type="button"
+                                      >
+                                        <X className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>

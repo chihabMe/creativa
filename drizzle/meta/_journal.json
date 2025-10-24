@@ -8,6 +8,27 @@
       "when": 1744460035662,
       "tag": "0000_elite_spectrum",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761221273701,
+      "tag": "0001_sparkling_lake",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761222547598,
+      "tag": "0002_bright_demogoblin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761227514458,
+      "tag": "0003_stormy_tusk",
+      "breakpoints": true
     }
   ]
 }

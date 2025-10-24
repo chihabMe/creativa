@@ -1,4 +1,4 @@
-import type { Product } from "@/components/product-card"
+import { Product } from "./types";
 
 export const products: Product[] = [
   {
@@ -123,4 +123,4 @@ export const products: Product[] = [
     image: "/placeholder.svg?height=400&width=400",
     categories: ["boho", "vert", "grand-tableaux"],
   },
-]
+];

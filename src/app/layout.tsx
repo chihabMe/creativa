@@ -15,11 +15,11 @@ export default async function RootLayout({
 }) {
   // const session = await auth();
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr">
       <body className="">
-        <Providers >
-            {children}
-                    <Toaster />
+        <Providers>
+          {children}
+          <Toaster />
         </Providers>
       </body>
     </html>

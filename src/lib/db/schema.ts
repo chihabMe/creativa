@@ -1,9 +1,30 @@
-import { relations } from "drizzle-orm"
-import { pgTable, primaryKey, text, timestamp, boolean, pgEnum, json, uuid, integer } from "drizzle-orm/pg-core"
+import { relations } from "drizzle-orm";
+import {
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  boolean,
+  pgEnum,
+  json,
+  uuid,
+  integer,
+} from "drizzle-orm/pg-core";
 
 // Enums
-export const orderStatusEnum = pgEnum("order_status", ["pending", "processing", "shipped", "delivered", "cancelled"])
-export const productBadgeEnum = pgEnum("product_badge", ["none", "new", "bestseller", "sale"])
+export const orderStatusEnum = pgEnum("order_status", [
+  "pending",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+]);
+export const productBadgeEnum = pgEnum("product_badge", [
+  "none",
+  "new",
+  "bestseller",
+  "sale",
+]);
 
 // Users table (for authentication)
 export const users = pgTable("users", {
@@ -16,7 +37,7 @@ export const users = pgTable("users", {
   role: text("role").default("user").notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-})
+});
 
 // Categories table
 export const categories = pgTable("categories", {
@@ -29,7 +50,7 @@ export const categories = pgTable("categories", {
   groupName: text("group_name"), // For grouping in dropdown (e.g., "Modèles", "Catégories", "Styles")
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-})
+});
 
 // Products table
 export const products = pgTable("products", {
@@ -43,10 +64,18 @@ export const products = pgTable("products", {
   featured: boolean("featured").default(false),
   images: json("images").$type<string[]>().default([]),
   sizes: json("sizes").$type<{ size: string; price: number }[]>().default([]),
-  frames: json("frames").$type<{ frame: string; price: number }[]>().default([]),
+  frames: json("frames")
+    .$type<
+      {
+        frame: string;
+        price: number;
+        subOptions?: { name: string; price: number }[];
+      }[]
+    >()
+    .default([]),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-})
+});
 
 // Product-Category junction table for many-to-many relationship
 export const productCategories = pgTable(
@@ -61,8 +90,8 @@ export const productCategories = pgTable(
   },
   (t) => ({
     pk: primaryKey({ columns: [t.productId, t.categoryId] }),
-  }),
-)
+  })
+);
 
 // Orders table
 export const orders = pgTable("orders", {
@@ -75,16 +104,16 @@ export const orders = pgTable("orders", {
   status: orderStatusEnum("status").default("pending").notNull(),
   total: integer("total").notNull(),
   shippingAddress: json("shipping_address").$type<{
-    address: string
-    city: string
-    state: string
-    postalCode: string
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
   }>(),
   paymentMethod: text("payment_method").default("cash"),
   notes: text("notes"),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-})
+});
 
 // Order items table
 export const orderItems = pgTable(
@@ -100,32 +129,36 @@ export const orderItems = pgTable(
     price: integer("price").notNull(),
     size: text("size"),
     frame: text("frame"),
+    subOption: text("sub_option"),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.orderId, t.productId] }),
-  }),
-)
+  })
+);
 
 // Relations
 export const categoriesRelations = relations(categories, ({ many, one }) => ({
   productCategories: many(productCategories),
-}))
+}));
 
 export const productsRelations = relations(products, ({ many }) => ({
   orderItems: many(orderItems),
   productCategories: many(productCategories),
-}))
+}));
 
-export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
-  product: one(products, {
-    fields: [productCategories.productId],
-    references: [products.id],
-  }),
-  category: one(categories, {
-    fields: [productCategories.categoryId],
-    references: [categories.id],
-  }),
-}))
+export const productCategoriesRelations = relations(
+  productCategories,
+  ({ one }) => ({
+    product: one(products, {
+      fields: [productCategories.productId],
+      references: [products.id],
+    }),
+    category: one(categories, {
+      fields: [productCategories.categoryId],
+      references: [categories.id],
+    }),
+  })
+);
 
 export const ordersRelations = relations(orders, ({ many, one }) => ({
   orderItems: many(orderItems),
@@ -133,7 +166,7 @@ export const ordersRelations = relations(orders, ({ many, one }) => ({
     fields: [orders.userId],
     references: [users.id],
   }),
-}))
+}));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
   order: one(orders, {
@@ -144,8 +177,8 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
     fields: [orderItems.productId],
     references: [products.id],
   }),
-}))
+}));
 
 export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
-}))
+}));
