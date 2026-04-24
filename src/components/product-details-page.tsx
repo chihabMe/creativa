@@ -311,11 +311,11 @@ export default function ProductDetailsPage({
                           className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
                           <span>{size.size}</span>
-                          {size.price > 0 && (
+{/* {size.price > 0 && (
                             <span className="text-[10px] sm:text-xs opacity-75">
                               +{size.price.toLocaleString("fr-DZ")} DA
                             </span>
-                          )}
+                          )} */}
                         </Label>
                       </div>
                     ))}
@@ -346,11 +346,11 @@ export default function ProductDetailsPage({
                           className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-400 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
                           <span>{frame.frame}</span>
-                          {frame.price > 0 && (
+{/* {frame.price > 0 && (
                             <span className="font-semibold">
                               +{frame.price.toLocaleString("fr-DZ")} DA
                             </span>
-                          )}
+                          )} */}
                         </Label>
                       </div>
                     ))}
@@ -383,9 +383,9 @@ export default function ProductDetailsPage({
                           className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
                           <span>{subOption.name}</span>
-                          <span className="font-semibold">
+{/* <span className="font-semibold">
                             +{subOption.price.toLocaleString("fr-DZ")} DA
-                          </span>
+                          </span> */}
                         </Label>
                       </div>
                     ))}

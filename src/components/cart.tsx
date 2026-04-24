@@ -44,6 +44,9 @@ import { useCart } from "@/contexts/cart-context";
 import { createOrder } from "@/lib/actions/order-actions";
 
 // Wilaya options for Algeria
+const DELIVERY_HOME_PRICE = 600;
+const DELIVERY_PICKUP_PRICE = 400;
+
 const wilayaOptions = [
   { value: "1", label: "1 - Adrar" },
   { value: "2", label: "2 - Chlef" },
@@ -221,6 +224,8 @@ export default function Cart() {
     "cart"
   );
   const [deliveryMethod, setDeliveryMethod] = useState("home");
+  const shippingPrice = deliveryMethod === "home" ? DELIVERY_HOME_PRICE : DELIVERY_PICKUP_PRICE;
+  const finalTotal = totalPrice + shippingPrice;
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [animationDirection, setAnimationDirection] = useState<
@@ -358,7 +363,7 @@ export default function Cart() {
           postalCode: "",
         },
         items: items,
-        total: totalPrice,
+        total: finalTotal,
         paymentMethod: "cash",
         notes: formData.note,
       };
@@ -844,7 +849,7 @@ export default function Cart() {
                           className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-50"
                         >
                           <Home className="h-6 w-6" />
-                          <span>À domicile</span>
+                          <span>À domicile (+ {DELIVERY_HOME_PRICE} DA)</span>
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -858,7 +863,7 @@ export default function Cart() {
                           className="flex w-full cursor-pointer flex-col items-center gap-2 rounded-md border border-gray-200 p-4 transition-all duration-300 peer-data-[state=checked]:border-emerald-600 peer-data-[state=checked]:bg-emerald-50"
                         >
                           <MapPin className="h-6 w-6" />
-                          <span>Point de relais</span>
+                          <span>Point de relais (+ {DELIVERY_PICKUP_PRICE} DA)</span>
                         </Label>
                       </div>
                     </RadioGroup>
@@ -881,6 +886,27 @@ export default function Cart() {
                       placeholder="Note (optionnel)"
                       className="h-24"
                     />
+                  </motion.div>
+
+                  <motion.div
+                    variants={fadeInUp}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: 0.5 }}
+                    className="mt-6 rounded-lg bg-gray-50 p-4 space-y-2"
+                  >
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Sous-total</span>
+                      <span className="font-medium">{totalPrice} DA</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Livraison ({deliveryMethod === "home" ? "À domicile" : "Point de relais"})</span>
+                      <span className="font-medium">{shippingPrice} DA</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2 text-base font-bold text-emerald-800">
+                      <span>Total à payer</span>
+                      <span>{finalTotal} DA</span>
+                    </div>
                   </motion.div>
                 </motion.div>
               )}
@@ -983,13 +1009,13 @@ export default function Cart() {
                       <span>Réduction</span>
                       <span>0 DA</span>
                     </motion.div>
-                    {/* <motion.div
+                    <motion.div
                       className="flex justify-between"
                       variants={itemFadeIn}
                     >
                       <span>Livraison</span>
-                      <span>0 DA</span>
-                    </motion.div> */}
+                      <span>{shippingPrice} DA</span>
+                    </motion.div>
                     <motion.div
                       className="flex justify-between border-t pt-2 font-semibold"
                       variants={fadeInUp}
@@ -1004,7 +1030,7 @@ export default function Cart() {
                       }}
                     >
                       <span>Total</span>
-                      <span>{totalPrice} DA</span>
+                      <span>{finalTotal} DA</span>
                     </motion.div>
                   </motion.div>
 
