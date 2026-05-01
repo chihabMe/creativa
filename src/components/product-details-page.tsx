@@ -15,7 +15,6 @@ import Breadcrumb from "@/components/breadcrumb";
 import WishlistButton from "@/components/wishlist-button";
 import { useRecentlyViewedStore } from "@/lib/store/recently-viewed-store";
 import RecentlyViewedProducts from "@/components/recently-viewed-products";
-import StockBadge from "@/components/stock-badge";
 import SocialShare from "@/components/social-share";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
 
@@ -28,31 +27,33 @@ export default function ProductDetailsPage({
   product,
   relatedProducts,
 }: ProductDetailsPageProps) {
-  const materialOptions = [
-    "Cadre avec Verre",
-    "Toile",
-    "Toile avec cadre"
-  ];
+  const productType =
+    product.materials && product.materials.length > 0
+      ? product.materials[0]
+      : "Toile";
 
-  const frameColorOptions = [
-    "Noir",
-    "Blanc",
-    "Bois"
-  ];
+  const frameColorOptions =
+    product.frameColors && product.frameColors.length > 0
+      ? product.frameColors
+      : ["Noir", "Blanc", "Bois"];
 
-  const dimensionOptions = [
-    { size: "23x32 cm", price: 2500 },
-    { size: "32x44 cm", price: 3800 },
-    { size: "44x62 cm", price: 5700 },
-    { size: "52x72 cm", price: 7500 },
-    { size: "62x82 cm", price: 9500 },
-  ];
+  const dimensionOptions =
+    product.dimensions && product.dimensions.length > 0
+      ? product.dimensions
+      : [
+          { size: "23x32 cm", price: 2500 },
+          { size: "32x44 cm", price: 3800 },
+          { size: "44x62 cm", price: 5700 },
+          { size: "52x72 cm", price: 7500 },
+          { size: "62x82 cm", price: 9500 },
+        ];
 
-  const [selectedMaterial, setSelectedMaterial] = useState(materialOptions[0]);
-  const [selectedFrameColor, setSelectedFrameColor] = useState(frameColorOptions[0]);
-  const [selectedDimension, setSelectedDimension] = useState(dimensionOptions[0].size);
+  const selectedMaterial = productType;
+  const [selectedFrameColor, setSelectedFrameColor] = useState(frameColorOptions[0] || "");
+  const [selectedDimension, setSelectedDimension] = useState(dimensionOptions[0]?.size || "");
 
-  const isFrameColorVisible = selectedMaterial === "Cadre avec Verre" || selectedMaterial === "Toile avec cadre";
+  const isFrameColorVisible =
+    productType === "Cadre avec Verre" || productType === "Toile avec cadre";
 
   useEffect(() => {
     if (!isFrameColorVisible) {
@@ -60,7 +61,7 @@ export default function ProductDetailsPage({
     } else if (!selectedFrameColor) {
       setSelectedFrameColor(frameColorOptions[0]);
     }
-  }, [selectedMaterial, isFrameColorVisible]);
+  }, [isFrameColorVisible, selectedFrameColor, frameColorOptions]);
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(
@@ -75,7 +76,9 @@ export default function ProductDetailsPage({
   } = useCart();
   const { addItem } = useRecentlyViewedStore();
 
-  const finalPrice = dimensionOptions.find((d) => d.size === selectedDimension)?.price || 2500;
+  const finalPrice =
+    dimensionOptions.find((d) => d.size === selectedDimension)?.price ??
+    product.price;
 
   // Check if this product configuration is already in the cart
   const isInCart = () => {
@@ -249,9 +252,6 @@ export default function ProductDetailsPage({
                   </Link>
                 ))}
               </div>
-              <div className="mt-2 inline-block">
-                <StockBadge stock={product.stock} />
-              </div>
               <p className="mt-3 text-xl sm:text-2xl font-semibold">
                 {finalPrice} DA
               </p>
@@ -259,28 +259,10 @@ export default function ProductDetailsPage({
 
             <div className="space-y-4">
               <div>
-                <h3 className="mb-2 font-medium">Type de matériel</h3>
-                <RadioGroup
-                  value={selectedMaterial}
-                  onValueChange={setSelectedMaterial}
-                  className="grid grid-cols-1 gap-2 sm:grid-cols-3"
-                >
-                  {materialOptions.map((material) => (
-                    <div key={material} className="flex items-center space-x-2">
-                      <RadioGroupItem
-                        value={material}
-                        id={`material-${material.replace(/\s+/g, "-")}`}
-                        className="peer sr-only"
-                      />
-                      <Label
-                        htmlFor={`material-${material.replace(/\s+/g, "-")}`}
-                        className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
-                      >
-                        <span>{material}</span>
-                      </Label>
-                    </div>
-                  ))}
-                </RadioGroup>
+                <h3 className="mb-2 font-medium">Type</h3>
+                <div className="inline-flex h-12 items-center rounded-md border border-gray-800 bg-gray-800 px-4 text-sm text-white">
+                  {productType}
+                </div>
               </div>
 
               {isFrameColorVisible && (
@@ -365,11 +347,8 @@ export default function ProductDetailsPage({
                   className="w-full sm:w-auto sm:flex-1 md:w-1/3 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-95"
                   size="lg"
                   onClick={handleBuyNow}
-                  disabled={product.stock <= 0}
                 >
-                  {product.stock <= 0
-                    ? "Rupture de stock"
-                    : "J'achète maintenant"}
+                  J'achète maintenant
                 </Button>
                 <div className="flex w-full gap-2">
                   <Button
@@ -381,7 +360,6 @@ export default function ProductDetailsPage({
                     }`}
                     size="lg"
                     onClick={handleAddToCart}
-                    disabled={product.stock <= 0}
                   >
                     {cartButtonIcon}
                     <span className="hidden sm:inline mr-1">
