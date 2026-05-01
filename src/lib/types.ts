@@ -15,6 +15,9 @@ export interface Product {
     price: number;
     subOptions?: { name: string; price: number }[];
   }[];
+  materials?: string[];
+  frameColors?: string[];
+  dimensions?: { size: string; price: number }[];
   createdAt: Date;
   updatedAt: Date;
 }

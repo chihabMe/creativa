@@ -10,7 +10,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/contexts/cart-context"
 import WishlistButton from "@/components/wishlist-button"
-import { Badge } from "@/components/ui/badge"
 import { getFeaturedProducts } from "@/lib/data"
 
 interface ProductCardProps {
@@ -20,6 +19,10 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, index }: ProductCardProps) {
   const { items } = useCart()
+  const displayPrice =
+    product.dimensions && product.dimensions.length > 0
+      ? Math.min(...product.dimensions.map((d) => d.price))
+      : product.price
 
   // Find if product is already in cart
   const cartItem = items.find((item) => item.id === product.id.toString())
@@ -81,16 +84,9 @@ export default function ProductCard({ product, index }: ProductCardProps) {
               {product.name}
             </h3>
           </Link>
-          {product.stock <= 0 && (
-            <div className="mt-1 text-center">
-              <Badge variant="destructive" className="text-xs">
-                Rupture de stock
-              </Badge>
-            </div>
-          )}
         </CardContent>
         <CardFooter className="flex items-center justify-between py-2 px-2 pt-0">
-          <span className="font-semibold text-base md:text-lg">{product.price} DA</span>
+          <span className="font-semibold text-base md:text-lg">{displayPrice} DA</span>
 
           <div className="flex items-center gap-2">
             <WishlistButton productId={product.id} productName={product.name} variant="ghost" className="h-8 w-8" />

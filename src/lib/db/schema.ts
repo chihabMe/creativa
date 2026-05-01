@@ -73,6 +73,17 @@ export const products = pgTable("products", {
       }[]
     >()
     .default([]),
+  materials: json("materials").$type<string[]>().default(["Cadre avec Verre", "Toile", "Toile avec cadre"]),
+  frameColors: json("frame_colors").$type<string[]>().default(["Noir", "Blanc", "Bois"]),
+  dimensions: json("dimensions")
+    .$type<{ size: string; price: number }[]>()
+    .default([
+      { size: "23x32 cm", price: 2500 },
+      { size: "32x44 cm", price: 3800 },
+      { size: "44x62 cm", price: 5700 },
+      { size: "52x72 cm", price: 7500 },
+      { size: "62x82 cm", price: 9500 },
+    ]),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });

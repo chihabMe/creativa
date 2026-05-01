@@ -15,7 +15,6 @@ import Breadcrumb from "@/components/breadcrumb";
 import WishlistButton from "@/components/wishlist-button";
 import { useRecentlyViewedStore } from "@/lib/store/recently-viewed-store";
 import RecentlyViewedProducts from "@/components/recently-viewed-products";
-import StockBadge from "@/components/stock-badge";
 import SocialShare from "@/components/social-share";
 import { getProductBySlug, getRelatedProducts } from "@/lib/data";
 
@@ -28,35 +27,41 @@ export default function ProductDetailsPage({
   product,
   relatedProducts,
 }: ProductDetailsPageProps) {
-  const [selectedSize, setSelectedSize] = useState(
-    product.sizes && product.sizes.length > 0
-      ? product.sizes[0].size
-      : "1M×50CM"
-  );
-  const [selectedFrame, setSelectedFrame] = useState(
-    product.frames && product.frames.length > 0
-      ? product.frames[0].frame
-      : "SANS"
-  );
+  const productType =
+    product.materials && product.materials.length > 0
+      ? product.materials[0]
+      : "Toile";
 
-  // Get the current frame's sub-options
-  const currentFrameSubOptions =
-    product.frames?.find((f) => f.frame === selectedFrame)?.subOptions || [];
+  const frameColorOptions =
+    product.frameColors && product.frameColors.length > 0
+      ? product.frameColors
+      : ["Noir", "Blanc", "Bois"];
 
-  const [selectedFrameSubOption, setSelectedFrameSubOption] = useState(
-    currentFrameSubOptions.length > 0 ? currentFrameSubOptions[0].name : ""
-  );
+  const dimensionOptions =
+    product.dimensions && product.dimensions.length > 0
+      ? product.dimensions
+      : [
+          { size: "23x32 cm", price: 2500 },
+          { size: "32x44 cm", price: 3800 },
+          { size: "44x62 cm", price: 5700 },
+          { size: "52x72 cm", price: 7500 },
+          { size: "62x82 cm", price: 9500 },
+        ];
 
-  // Update selected sub-option when frame changes
+  const selectedMaterial = productType;
+  const [selectedFrameColor, setSelectedFrameColor] = useState(frameColorOptions[0] || "");
+  const [selectedDimension, setSelectedDimension] = useState(dimensionOptions[0]?.size || "");
+
+  const isFrameColorVisible =
+    productType === "Cadre avec Verre" || productType === "Toile avec cadre";
+
   useEffect(() => {
-    const newFrameSubOptions =
-      product.frames?.find((f) => f.frame === selectedFrame)?.subOptions || [];
-    if (newFrameSubOptions.length > 0) {
-      setSelectedFrameSubOption(newFrameSubOptions[0].name);
-    } else {
-      setSelectedFrameSubOption("");
+    if (!isFrameColorVisible) {
+      setSelectedFrameColor("");
+    } else if (!selectedFrameColor) {
+      setSelectedFrameColor(frameColorOptions[0]);
     }
-  }, [selectedFrame, product.frames]);
+  }, [isFrameColorVisible, selectedFrameColor, frameColorOptions]);
 
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(
@@ -71,14 +76,18 @@ export default function ProductDetailsPage({
   } = useCart();
   const { addItem } = useRecentlyViewedStore();
 
+  const finalPrice =
+    dimensionOptions.find((d) => d.size === selectedDimension)?.price ??
+    product.price;
+
   // Check if this product configuration is already in the cart
   const isInCart = () => {
     return cartItems.some(
       (item) =>
         item.id === product.id.toString() &&
-        item.size === selectedSize &&
-        item.frame === selectedFrame &&
-        item.frameSubOption === selectedFrameSubOption
+        item.size === selectedDimension &&
+        item.frame === selectedMaterial &&
+        item.frameSubOption === selectedFrameColor
     );
   };
 
@@ -87,9 +96,9 @@ export default function ProductDetailsPage({
     return cartItems.find(
       (item) =>
         item.id === product.id.toString() &&
-        item.size === selectedSize &&
-        item.frame === selectedFrame &&
-        item.frameSubOption === selectedFrameSubOption
+        item.size === selectedDimension &&
+        item.frame === selectedMaterial &&
+        item.frameSubOption === selectedFrameColor
     );
   };
 
@@ -98,42 +107,6 @@ export default function ProductDetailsPage({
     addItem(product.id);
   }, [product.id, addItem]);
 
-  // Calculate the final price based on selected size and frame
-  const getSelectedSizePrice = () => {
-    if (product.sizes && product.sizes.length > 0) {
-      const size = product.sizes.find((s) => s.size === selectedSize);
-      return size ? size.price : product.price;
-    }
-    return product.price;
-  };
-
-  const getSelectedFramePrice = () => {
-    if (product.frames && product.frames.length > 0) {
-      const frame = product.frames.find((f) => f.frame === selectedFrame);
-      return frame ? frame.price : 0;
-    }
-    return 0;
-  };
-
-  const getSelectedFrameSubOptionPrice = () => {
-    if (product.frames && product.frames.length > 0) {
-      const frame = product.frames.find((f) => f.frame === selectedFrame);
-      if (frame && frame.subOptions && frame.subOptions.length > 0) {
-        const subOption = frame.subOptions.find(
-          (s) => s.name === selectedFrameSubOption
-        );
-        return subOption ? subOption.price : 0;
-      }
-    }
-    return 0;
-  };
-
-  const finalPrice =
-    product.price +
-    getSelectedSizePrice() +
-    getSelectedFramePrice() +
-    getSelectedFrameSubOptionPrice();
-
   const handleAddToCart = () => {
     const existingItem = getCartItem();
 
@@ -141,9 +114,9 @@ export default function ProductDetailsPage({
       // If the item is already in the cart, remove it
       removeItemFromCart(
         existingItem.id,
-        selectedSize,
-        selectedFrame,
-        selectedFrameSubOption
+        selectedDimension,
+        selectedMaterial,
+        selectedFrameColor
       );
 
       toast({
@@ -157,9 +130,9 @@ export default function ProductDetailsPage({
         name: product.name,
         price: finalPrice,
         quantity,
-        size: selectedSize,
-        frame: selectedFrame,
-        frameSubOption: selectedFrameSubOption,
+        size: selectedDimension,
+        frame: selectedMaterial,
+        frameSubOption: selectedFrameColor,
         image: (product.images && product.images[0]) || "",
       });
 
@@ -177,9 +150,9 @@ export default function ProductDetailsPage({
       name: product.name,
       price: finalPrice,
       quantity,
-      size: selectedSize,
-      frame: selectedFrame,
-      frameSubOption: selectedFrameSubOption,
+      size: selectedDimension,
+      frame: selectedMaterial,
+      frameSubOption: selectedFrameColor,
       image: (product.images && product.images[0]) || "",
     });
 
@@ -279,43 +252,39 @@ export default function ProductDetailsPage({
                   </Link>
                 ))}
               </div>
-              <div className="mt-2 inline-block">
-                <StockBadge stock={product.stock} />
-              </div>
               <p className="mt-3 text-xl sm:text-2xl font-semibold">
                 {finalPrice} DA
               </p>
             </motion.div>
 
             <div className="space-y-4">
-              {product.sizes && product.sizes.length > 0 && (
+              <div>
+                <h3 className="mb-2 font-medium">Type</h3>
+                <div className="inline-flex h-12 items-center rounded-md border border-gray-800 bg-gray-800 px-4 text-sm text-white">
+                  {productType}
+                </div>
+              </div>
+
+              {isFrameColorVisible && (
                 <div>
-                  <h3 className="mb-2 font-medium">Tailles</h3>
+                  <h3 className="mb-2 font-medium">Couleur d&apos;encadrement</h3>
                   <RadioGroup
-                    value={selectedSize}
-                    onValueChange={setSelectedSize}
-                    className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4"
+                    value={selectedFrameColor}
+                    onValueChange={setSelectedFrameColor}
+                    className="grid grid-cols-1 gap-2 sm:grid-cols-3"
                   >
-                    {product.sizes.map((size) => (
-                      <div
-                        key={size.size}
-                        className="flex items-center space-x-2"
-                      >
+                    {frameColorOptions.map((color) => (
+                      <div key={color} className="flex items-center space-x-2">
                         <RadioGroupItem
-                          value={size.size}
-                          id={`size-${size.size}`}
+                          value={color}
+                          id={`color-${color}`}
                           className="peer sr-only"
                         />
                         <Label
-                          htmlFor={`size-${size.size}`}
+                          htmlFor={`color-${color}`}
                           className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                         >
-                          <span>{size.size}</span>
-{/* {size.price > 0 && (
-                            <span className="text-[10px] sm:text-xs opacity-75">
-                              +{size.price.toLocaleString("fr-DZ")} DA
-                            </span>
-                          )} */}
+                          <span>{color}</span>
                         </Label>
                       </div>
                     ))}
@@ -323,75 +292,30 @@ export default function ProductDetailsPage({
                 </div>
               )}
 
-              {product.frames && product.frames.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-medium">Encadrement</h3>
-                  <RadioGroup
-                    value={selectedFrame}
-                    onValueChange={setSelectedFrame}
-                    className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-                  >
-                    {product.frames.map((frame) => (
-                      <div
-                        key={frame.frame}
-                        className="flex items-center space-x-2"
+              <div>
+                <h3 className="mb-2 font-medium">Dimensions</h3>
+                <RadioGroup
+                  value={selectedDimension}
+                  onValueChange={setSelectedDimension}
+                  className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3"
+                >
+                  {dimensionOptions.map((dim) => (
+                    <div key={dim.size} className="flex items-center space-x-2">
+                      <RadioGroupItem
+                        value={dim.size}
+                        id={`dim-${dim.size}`}
+                        className="peer sr-only"
+                      />
+                      <Label
+                        htmlFor={`dim-${dim.size}`}
+                        className="flex w-full cursor-pointer flex-col items-center justify-center rounded-md border border-gray-200 h-12 px-2 sm:px-3 py-2 text-center text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
                       >
-                        <RadioGroupItem
-                          value={frame.frame}
-                          id={`frame-${frame.frame}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`frame-${frame.frame}`}
-                          className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-400 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
-                        >
-                          <span>{frame.frame}</span>
-{/* {frame.price > 0 && (
-                            <span className="font-semibold">
-                              +{frame.price.toLocaleString("fr-DZ")} DA
-                            </span>
-                          )} */}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-              )}
-
-              {currentFrameSubOptions.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-medium">
-                    Options pour {selectedFrame}
-                  </h3>
-                  <RadioGroup
-                    value={selectedFrameSubOption}
-                    onValueChange={setSelectedFrameSubOption}
-                    className="grid grid-cols-1 gap-2 sm:grid-cols-2"
-                  >
-                    {currentFrameSubOptions.map((subOption) => (
-                      <div
-                        key={subOption.name}
-                        className="flex items-center space-x-2"
-                      >
-                        <RadioGroupItem
-                          value={subOption.name}
-                          id={`framesuboption-${subOption.name}`}
-                          className="peer sr-only"
-                        />
-                        <Label
-                          htmlFor={`framesuboption-${subOption.name}`}
-                          className="flex w-full cursor-pointer items-center justify-between h-12 rounded-md border border-gray-200 px-2 sm:px-3 py-2 text-xs sm:text-sm peer-data-[state=checked]:border-gray-800 peer-data-[state=checked]:bg-gray-800 peer-data-[state=checked]:text-white"
-                        >
-                          <span>{subOption.name}</span>
-{/* <span className="font-semibold">
-                            +{subOption.price.toLocaleString("fr-DZ")} DA
-                          </span> */}
-                        </Label>
-                      </div>
-                    ))}
-                  </RadioGroup>
-                </div>
-              )}
+                        <span>{dim.size}</span>
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
 
               <div>
                 <h3 className="mb-2 font-medium">Quantité</h3>
@@ -423,11 +347,8 @@ export default function ProductDetailsPage({
                   className="w-full sm:w-auto sm:flex-1 md:w-1/3 h-12 bg-emerald-600 hover:bg-emerald-700 active:scale-95"
                   size="lg"
                   onClick={handleBuyNow}
-                  disabled={product.stock <= 0}
                 >
-                  {product.stock <= 0
-                    ? "Rupture de stock"
-                    : "J'achète maintenant"}
+                  J'achète maintenant
                 </Button>
                 <div className="flex w-full gap-2">
                   <Button
@@ -439,7 +360,6 @@ export default function ProductDetailsPage({
                     }`}
                     size="lg"
                     onClick={handleAddToCart}
-                    disabled={product.stock <= 0}
                   >
                     {cartButtonIcon}
                     <span className="hidden sm:inline mr-1">

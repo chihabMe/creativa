@@ -7,6 +7,7 @@ import { productCategories, products } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import slugify from "slugify";
 import { CACHE_TAGS } from "../constants";
+import { nanoid } from "nanoid";
 
 // Schema for creating a product
 const createProductSchema = z.object({
@@ -43,6 +44,23 @@ const createProductSchema = z.object({
       })
     )
     .default([]),
+  materials: z.array(z.string().min(1)).min(1).max(1).default(["Toile"]),
+  frameColors: z.array(z.string().min(1)).default(["Noir", "Blanc", "Bois"]),
+  dimensions: z
+    .array(
+      z.object({
+        size: z.string().min(1),
+        price: z.coerce.number().min(0),
+      })
+    )
+    .min(1)
+    .default([
+      { size: "23x32 cm", price: 2500 },
+      { size: "32x44 cm", price: 3800 },
+      { size: "44x62 cm", price: 5700 },
+      { size: "52x72 cm", price: 7500 },
+      { size: "62x82 cm", price: 9500 },
+    ]),
 });
 
 // Schema for updating a product
@@ -61,7 +79,8 @@ export const createProduct = adminAction
   .action(async ({ parsedInput: { name, featured, categoryIds, ...data } }) => {
     try {
       // Generate a slug from the name
-      const slug = slugify(name, { lower: true, strict: true });
+      const baseSlug = slugify(name, { lower: true, strict: true });
+      const slug = baseSlug || `produit-${nanoid(8).toLowerCase()}`;
 
       // Insert the product into the database
       const result = await db.transaction(async (tx) => {
@@ -110,6 +129,21 @@ export const createProduct = adminAction
       return { success: true, message: "Produit créé avec succès" };
     } catch (error) {
       console.error("Error creating product:", error);
+      const dbError = error as { code?: string; constraint?: string };
+      if (dbError?.code === "23505") {
+        return {
+          success: false,
+          message:
+            "Un produit avec ce nom existe déjà. Modifiez le nom puis réessayez.",
+        };
+      }
+      if (dbError?.code === "42703") {
+        return {
+          success: false,
+          message:
+            "Base de données non synchronisée. Exécutez la migration (db:push) puis réessayez.",
+        };
+      }
       return {
         success: false,
         message: "Erreur lors de la création du produit",
@@ -129,7 +163,8 @@ export const updateProduct = adminAction
         });
 
         // Generate a slug from the name
-        const slug = slugify(name, { lower: true, strict: true });
+        const baseSlug = slugify(name, { lower: true, strict: true });
+        const slug = baseSlug || `produit-${nanoid(8).toLowerCase()}`;
 
         // Update the product in the database
         await db.transaction(async (tx) => {
@@ -182,6 +217,21 @@ export const updateProduct = adminAction
         return { success: true, message: "Produit mis à jour avec succès" };
       } catch (error) {
         console.error("Error updating product:", error);
+        const dbError = error as { code?: string; constraint?: string };
+        if (dbError?.code === "23505") {
+          return {
+            success: false,
+            message:
+              "Ce nom/slug est déjà utilisé par un autre produit. Modifiez le nom.",
+          };
+        }
+        if (dbError?.code === "42703") {
+          return {
+            success: false,
+            message:
+              "Base de données non synchronisée. Exécutez la migration (db:push) puis réessayez.",
+          };
+        }
         return {
           success: false,
           message: "Erreur lors de la mise à jour du produit",

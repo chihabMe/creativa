@@ -40,18 +40,19 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
 
   const [formData, setFormData] = useState({
     name: "",
-    price: "",
     description: "",
-    stock: "",
     categoryIds: [] as string[],
     badge: "none",
     featured: false,
-    sizes: [] as { size: string; price: string }[],
-    frames: [] as {
-      frame: string;
-      price: string;
-      subOptions: { name: string; price: string }[];
-    }[],
+    productType: "Cadre avec Verre",
+    frameColors: ["Noir", "Blanc", "Bois"] as string[],
+    dimensions: [
+      { size: "23x32 cm", price: "2500" },
+      { size: "32x44 cm", price: "3800" },
+      { size: "44x62 cm", price: "5700" },
+      { size: "52x72 cm", price: "7500" },
+      { size: "62x82 cm", price: "9500" },
+    ] as { size: string; price: string }[],
   });
 
   const [images, setImages] = useState<{ url: string; publicId: string }[]>([]);
@@ -80,80 +81,48 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
     }
   };
 
-  const handleAddSize = () => {
+  const handleAddFrameColor = () => {
     setFormData((prev) => ({
       ...prev,
-      sizes: [...prev.sizes, { size: "", price: "" }],
+      frameColors: [...prev.frameColors, ""],
     }));
   };
 
-  const handleSizeChange = (
+  const handleFrameColorChange = (index: number, value: string) => {
+    const next = [...formData.frameColors];
+    next[index] = value;
+    setFormData((prev) => ({ ...prev, frameColors: next }));
+  };
+
+  const handleRemoveFrameColor = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      frameColors: prev.frameColors.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleAddDimension = () => {
+    setFormData((prev) => ({
+      ...prev,
+      dimensions: [...prev.dimensions, { size: "", price: "" }],
+    }));
+  };
+
+  const handleDimensionChange = (
     index: number,
     field: "size" | "price",
     value: string
   ) => {
-    const newSizes = [...formData.sizes];
-    newSizes[index][field] = value;
-    setFormData((prev) => ({ ...prev, sizes: newSizes }));
+    const next = [...formData.dimensions];
+    next[index][field] = value;
+    setFormData((prev) => ({ ...prev, dimensions: next }));
   };
 
-  const handleRemoveSize = (index: number) => {
+  const handleRemoveDimension = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      sizes: prev.sizes.filter((_, i) => i !== index),
+      dimensions: prev.dimensions.filter((_, i) => i !== index),
     }));
-  };
-
-  const handleAddFrame = () => {
-    setFormData((prev) => ({
-      ...prev,
-      frames: [...prev.frames, { frame: "", price: "", subOptions: [] }],
-    }));
-  };
-
-  const handleFrameChange = (
-    index: number,
-    field: "frame" | "price",
-    value: string
-  ) => {
-    const newFrames = [...formData.frames];
-    newFrames[index][field] = value;
-    setFormData((prev) => ({ ...prev, frames: newFrames }));
-  };
-
-  const handleRemoveFrame = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      frames: prev.frames.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleAddSubOption = (frameIndex: number) => {
-    const newFrames = [...formData.frames];
-    newFrames[frameIndex].subOptions.push({ name: "", price: "" });
-    setFormData((prev) => ({ ...prev, frames: newFrames }));
-  };
-
-  const handleSubOptionChange = (
-    frameIndex: number,
-    subOptionIndex: number,
-    field: "name" | "price",
-    value: string
-  ) => {
-    const newFrames = [...formData.frames];
-    newFrames[frameIndex].subOptions[subOptionIndex][field] = value;
-    setFormData((prev) => ({ ...prev, frames: newFrames }));
-  };
-
-  const handleRemoveSubOption = (
-    frameIndex: number,
-    subOptionIndex: number
-  ) => {
-    const newFrames = [...formData.frames];
-    newFrames[frameIndex].subOptions = newFrames[frameIndex].subOptions.filter(
-      (_, i) => i !== subOptionIndex
-    );
-    setFormData((prev) => ({ ...prev, frames: newFrames }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -173,29 +142,44 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
       }
 
       // Convert form data to the format expected by the server action
+      const normalizedDimensions = formData.dimensions
+        .filter((d) => d.size.trim() !== "")
+        .map((d) => ({
+          size: d.size.trim(),
+          price: Number(d.price),
+        }))
+        .filter((d) => Number.isFinite(d.price) && d.price >= 0);
+
+      if (normalizedDimensions.length === 0) {
+        toast({
+          title: "Erreur",
+          description:
+            "Veuillez ajouter au moins une dimension avec un prix valide.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
+      const basePrice = Math.min(...normalizedDimensions.map((d) => d.price));
+
       const productData = {
         name: formData.name,
-        price: Number(formData.price),
+        price: basePrice,
         description: formData.description,
-        stock: Number(formData.stock),
+        stock: 0,
         badge: formData.badge as "none" | "new" | "bestseller" | "sale",
         featured: formData.featured,
         images: images.map((img) => img.url), // We only need the URLs for the database
         categoryIds: formData.categoryIds
           .map((cat) => categories.find((c) => c.slug === cat)?.id)
           .filter((id): id is string => Boolean(id)),
-        sizes: formData.sizes.map((size) => ({
-          size: size.size,
-          price: Number(size.price),
-        })),
-        frames: formData.frames.map((frame) => ({
-          frame: frame.frame,
-          price: Number(frame.price),
-          subOptions: frame.subOptions.map((subOption) => ({
-            name: subOption.name,
-            price: Number(subOption.price),
-          })),
-        })),
+        materials: [formData.productType],
+        frameColors:
+          formData.productType === "Toile"
+            ? []
+            : formData.frameColors.map((c) => c.trim()).filter(Boolean),
+        dimensions: normalizedDimensions,
       };
 
       const result = await createProduct(productData);
@@ -207,10 +191,18 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
         });
         router.push("/admin/products");
       } else {
+        const validationMessage =
+          result?.validationErrors
+            ? "Données invalides. Vérifiez le nom, les dimensions et les prix."
+            : undefined;
+        const serverMessage =
+          typeof result?.serverError === "string" ? result.serverError : undefined;
         toast({
           title: "Erreur",
           description:
             result?.data?.message ??
+            validationMessage ??
+            serverMessage ??
             "Une erreur est survenue lors de la création du produit.",
           variant: "destructive",
         });
@@ -276,31 +268,6 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="price">Prix (DA)</Label>
-                    <Input
-                      id="price"
-                      name="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={handleInputChange}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="stock">Stock</Label>
-                    <Input
-                      id="stock"
-                      name="stock"
-                      type="number"
-                      value={formData.stock}
-                      onChange={handleInputChange}
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
@@ -352,197 +319,93 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
 
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Variantes</CardTitle>
+              <CardTitle>Configuration Catalogue</CardTitle>
               <CardDescription>
-                Ajoutez des tailles et options d'encadrement pour ce produit.
+                Choisissez un seul type produit, puis configurez ses couleurs de cadre et dimensions avec prix.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label>Tailles disponibles</Label>
-                    <Button variant="outline" size="sm" onClick={handleAddSize}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Ajouter une taille
-                    </Button>
-                  </div>
+                  <Label>Type de produit</Label>
+                  <Select
+                    value={formData.productType}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, productType: value }))
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Cadre avec Verre">Cadre avec Verre</SelectItem>
+                      <SelectItem value="Toile">Toile</SelectItem>
+                      <SelectItem value="Toile avec cadre">Toile avec cadre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {formData.sizes.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      Aucune taille ajoutée.
-                    </p>
-                  ) : (
+                {formData.productType !== "Toile" && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label>Couleurs d&apos;encadrement</Label>
+                      <Button variant="outline" size="sm" onClick={handleAddFrameColor} type="button">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Ajouter
+                      </Button>
+                    </div>
                     <div className="space-y-2">
-                      {formData.sizes.map((size, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2"
-                        >
+                      {formData.frameColors.map((color, index) => (
+                        <div key={index} className="flex items-center space-x-2">
                           <Input
-                            value={size.size}
-                            onChange={(e) =>
-                              handleSizeChange(index, "size", e.target.value)
-                            }
-                            placeholder="ex: 1M×50CM"
+                            value={color}
+                            onChange={(e) => handleFrameColorChange(index, e.target.value)}
+                            placeholder="ex: Noir"
                             className="flex-1"
                           />
-                          <Input
-                            value={size.price}
-                            onChange={(e) =>
-                              handleSizeChange(index, "price", e.target.value)
-                            }
-                            placeholder="Prix (DA)"
-                            type="number"
-                            className="w-32"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveSize(index)}
-                          >
+                          <Button variant="ghost" size="icon" onClick={() => handleRemoveFrameColor(index)} type="button">
                             <X className="h-4 w-4" />
                           </Button>
                         </div>
                       ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label>Options d'encadrement</Label>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddFrame}
-                    >
+                    <Label>Dimensions & prix</Label>
+                    <Button variant="outline" size="sm" onClick={handleAddDimension} type="button">
                       <Plus className="mr-2 h-4 w-4" />
-                      Ajouter une option
+                      Ajouter
                     </Button>
                   </div>
-
-                  {formData.frames.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">
-                      Aucune option d'encadrement ajoutée.
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {formData.frames.map((frame, frameIndex) => (
-                        <div
-                          key={frameIndex}
-                          className="border rounded-lg p-4 space-y-3"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Input
-                              value={frame.frame}
-                              onChange={(e) =>
-                                handleFrameChange(
-                                  frameIndex,
-                                  "frame",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="ex: SANS ENCADREMENT"
-                              className="flex-1"
-                            />
-                            <Input
-                              value={frame.price}
-                              onChange={(e) =>
-                                handleFrameChange(
-                                  frameIndex,
-                                  "price",
-                                  e.target.value
-                                )
-                              }
-                              placeholder="Supplément (DA)"
-                              type="number"
-                              className="w-32"
-                            />
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleRemoveFrame(frameIndex)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-
-                          {/* Sub-options section */}
-                          <div className="ml-4 space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label className="text-sm text-muted-foreground">
-                                Sous-options
-                              </Label>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleAddSubOption(frameIndex)}
-                                type="button"
-                              >
-                                <Plus className="mr-1 h-3 w-3" />
-                                Ajouter une sous-option
-                              </Button>
-                            </div>
-
-                            {frame.subOptions.length > 0 && (
-                              <div className="space-y-2">
-                                {frame.subOptions.map(
-                                  (subOption, subOptionIndex) => (
-                                    <div
-                                      key={subOptionIndex}
-                                      className="flex items-center space-x-2"
-                                    >
-                                      <Input
-                                        value={subOption.name}
-                                        onChange={(e) =>
-                                          handleSubOptionChange(
-                                            frameIndex,
-                                            subOptionIndex,
-                                            "name",
-                                            e.target.value
-                                          )
-                                        }
-                                        placeholder="Nom de la sous-option"
-                                        className="flex-1"
-                                      />
-                                      <Input
-                                        value={subOption.price}
-                                        onChange={(e) =>
-                                          handleSubOptionChange(
-                                            frameIndex,
-                                            subOptionIndex,
-                                            "price",
-                                            e.target.value
-                                          )
-                                        }
-                                        placeholder="Prix (DA)"
-                                        type="number"
-                                        className="w-28"
-                                      />
-                                      <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                          handleRemoveSubOption(
-                                            frameIndex,
-                                            subOptionIndex
-                                          )
-                                        }
-                                        type="button"
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                    </div>
-                                  )
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="space-y-2">
+                    {formData.dimensions.map((dimension, index) => (
+                      <div key={index} className="flex items-center space-x-2">
+                        <Input
+                          value={dimension.size}
+                          onChange={(e) =>
+                            handleDimensionChange(index, "size", e.target.value)
+                          }
+                          placeholder="ex: 23 x 32"
+                          className="flex-1"
+                        />
+                        <Input
+                          value={dimension.price}
+                          onChange={(e) =>
+                            handleDimensionChange(index, "price", e.target.value)
+                          }
+                          placeholder="Prix (DA)"
+                          type="number"
+                          className="w-32"
+                        />
+                        <Button variant="ghost" size="icon" onClick={() => handleRemoveDimension(index)} type="button">
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </CardContent>
