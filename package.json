@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "db:push": "pnpm drizzle-kit push:pg",
@@ -61,7 +61,7 @@
     "lucide-react": "^0.454.0",
     "motion": "latest",
     "nanoid": "^5.1.5",
-    "next": "15.1.7",
+    "next": "16.2.4",
     "next-auth": "latest",
     "next-nprogress-bar": "^2.4.7",
     "next-safe-action": "latest",
