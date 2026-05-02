@@ -3,7 +3,6 @@
 import {
   getDashboardStats,
   getRecentOrders,
-  getLowStockProducts,
 } from "@/lib/data";
 import {
   Package,
@@ -25,13 +24,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 interface Props {
   stats: Awaited<ReturnType<typeof getDashboardStats>>;
   recentOrders: Awaited<ReturnType<typeof getRecentOrders>>;
-  lowStockProducts: Awaited<ReturnType<typeof getLowStockProducts>>;
 }
 
 const AdminDashboardStats = ({
   stats,
   recentOrders,
-  lowStockProducts,
 }: Props) => {
   // Helper to format status display
   const getStatusDisplay = (status: string) => {
@@ -203,9 +200,9 @@ const AdminDashboardStats = ({
             </Card>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <div className="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
             {/* Recent Orders */}
-            <Card className="col-span-4">
+            <Card className="col-span-1">
               <CardHeader>
                 <CardTitle>Commandes récentes</CardTitle>
                 <CardDescription>
@@ -261,43 +258,6 @@ const AdminDashboardStats = ({
               </CardContent>
             </Card>
 
-            {/* Low Stock Products */}
-            <Card className="col-span-3">
-              <CardHeader>
-                <CardTitle>Produits en stock faible</CardTitle>
-                <CardDescription>
-                  {lowStockProducts.length} produits nécessitent votre
-                  attention.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b text-left text-sm font-medium text-gray-500">
-                        <th className="pb-2">Produit</th>
-                        <th className="pb-2">Stock</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lowStockProducts.map((product) => (
-                        <tr
-                          key={product.id}
-                          className="border-b text-sm last:border-0"
-                        >
-                          <td className="py-3">{product.name}</td>
-                          <td className="py-3">
-                            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
-                              {product.stock} restants
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </TabsContent>
       </Tabs>

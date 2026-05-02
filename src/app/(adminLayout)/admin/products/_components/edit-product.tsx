@@ -198,7 +198,6 @@ const EditProduct = ({ product, categories }: Props) => {
         name: formData.name,
         price: basePrice,
         description: formData.description,
-        stock: product.stock,
         badge: formData.badge as "none" | "new" | "bestseller" | "sale",
         featured: formData.featured,
         images: images.map((img) => img.url), // We only need the URLs for the database

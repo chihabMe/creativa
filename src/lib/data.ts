@@ -421,7 +421,6 @@ export const getCategoryBySlugFromDB = unstable_cache(
 const DASHBOARD_CACHE_TAGS = {
   dashboardStats: "dashboard-stats",
   recentOrders: "recent-orders",
-  lowStockProducts: "low-stock-products",
   salesAnalytics: "sales-analytics"
 }
 
@@ -592,27 +591,6 @@ export const getRecentOrders = unstable_cache(
   {
     tags: [DASHBOARD_CACHE_TAGS.recentOrders],
     revalidate: 1800, // Revalidate every 30 minutes
-  }
-)
-
-// Get low stock products
-export const getLowStockProducts = unstable_cache(
-  async (threshold = 5, limit = 10) => {
-    try {
-      return await db.query.products.findMany({
-        where: lt(products.stock, threshold),
-        orderBy: [products.stock],
-        limit
-      })
-    } catch (error) {
-      console.error("Error fetching low stock products:", error)
-      return []
-    }
-  },
-  ["low-stock-products"],
-  {
-    tags: [DASHBOARD_CACHE_TAGS.lowStockProducts],
-    revalidate: 3600, // Revalidate every hour
   }
 )
 

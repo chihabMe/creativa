@@ -167,7 +167,6 @@ export default function NewProductForm({ categories }: NewProductFormProps) {
         name: formData.name,
         price: basePrice,
         description: formData.description,
-        stock: 0,
         badge: formData.badge as "none" | "new" | "bestseller" | "sale",
         featured: formData.featured,
         images: images.map((img) => img.url), // We only need the URLs for the database

@@ -144,7 +144,6 @@ async function seedDatabase() {
         slug: buildSlug(name),
         description: faker.lorem.paragraph(),
         price: minPrice,
-        stock: 0,
         badge: faker.helpers.arrayElement(["none", "new", "bestseller", "sale"]),
         featured: faker.datatype.boolean({ probability: 0.3 }),
         images: [image],

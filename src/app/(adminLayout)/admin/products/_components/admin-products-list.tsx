@@ -46,7 +46,6 @@ const AdminProductsList = ({products}:Props) => {
                   <TableHead>ID</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead>Prix</TableHead>
-                  <TableHead>Stock</TableHead>
                   <TableHead>Catégories</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -54,7 +53,7 @@ const AdminProductsList = ({products}:Props) => {
               <TableBody>
                 {products.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       Aucun produit trouvé.
                     </TableCell>
                   </TableRow>
@@ -74,7 +73,6 @@ const AdminProductsList = ({products}:Props) => {
                       <TableCell className="font-medium">{product.id}</TableCell>
                       <TableCell>{product.name}</TableCell>
                       <TableCell>{product.price.toLocaleString()} DA</TableCell>
-                      <TableCell>{product.stock}</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {(product.productCategories ?? []).slice(0, 2).map((category, index) => (

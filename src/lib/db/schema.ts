@@ -59,7 +59,6 @@ export const products = pgTable("products", {
   slug: text("slug").notNull().unique(),
   description: text("description"),
   price: integer("price").notNull(),
-  stock: integer("stock").default(0).notNull(),
   badge: productBadgeEnum("badge").default("none"),
   featured: boolean("featured").default(false),
   images: json("images").$type<string[]>().default([]),

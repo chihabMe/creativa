@@ -14,7 +14,6 @@ const createProductSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
   price: z.coerce.number().min(1, "Le prix doit être supérieur à 0"),
   description: z.string().optional(),
-  stock: z.coerce.number().min(0, "Le stock ne peut pas être négatif"),
   badge: z.enum(["none", "new", "bestseller", "sale"]).default("none"),
   featured: z.boolean().default(false),
   images: z.array(z.string()).default([]),
