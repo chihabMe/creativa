@@ -6,9 +6,9 @@ import { getCategories } from "@/lib/actions/ category-actions";
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const productId = params.id;
+  const { id: productId } = await params;
   const product = await getProductById(productId);
   const categories = await getCategories();
   if (!product) return notFound();

@@ -102,7 +102,7 @@ const AdminProductsList = ({products}:Props) => {
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem asChild>
-                              <Link href={`/products/${product.id}`}>
+                              <Link href={`/products/${product.slug}`}>
                                 <Eye className="mr-2 h-4 w-4" />
                                 Voir
                               </Link>
