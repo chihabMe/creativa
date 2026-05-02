@@ -218,8 +218,10 @@ export async function getOrderById(id: string) {
 // Get an order by order number
 export async function getOrderByNumber(orderNumber: string) {
   try {
+    const normalizedOrderNumber = orderNumber.trim().toUpperCase();
+
     return await db.query.orders.findFirst({
-      where: eq(orders.orderNumber, orderNumber),
+      where: eq(orders.orderNumber, normalizedOrderNumber),
       with: {
         orderItems: {
           with: {
