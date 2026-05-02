@@ -35,7 +35,30 @@ export const users = pgTable("users", {
   image: text("image"),
   password: text("password"),
   role: text("role").default("user").notNull(),
+  passwordChangedAt: timestamp("password_changed_at", { mode: "date" }),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+// Site settings (single-row config)
+export const siteSettings = pgTable("site_settings", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  supportEmail: text("support_email").notNull().default("esprit.creativadeco@gmail.com"),
+  phone: text("phone"),
+  whatsapp: text("whatsapp"),
+  address: text("address"),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+});
+
+// Per-admin preferences
+export const adminPreferences = pgTable("admin_preferences", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
+  orderAutoRefresh: boolean("order_auto_refresh").default(false).notNull(),
+  ordersPageSize: integer("orders_page_size").default(10).notNull(),
+  productsPageSize: integer("products_page_size").default(10).notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 });
 
@@ -191,4 +214,12 @@ export const orderItemsRelations = relations(orderItems, ({ one }) => ({
 
 export const usersRelations = relations(users, ({ many }) => ({
   orders: many(orders),
+  adminPreferences: many(adminPreferences),
+}));
+
+export const adminPreferencesRelations = relations(adminPreferences, ({ one }) => ({
+  user: one(users, {
+    fields: [adminPreferences.userId],
+    references: [users.id],
+  }),
 }));

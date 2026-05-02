@@ -1,8 +1,22 @@
 import Link from "next/link"
 import { Facebook, Instagram, Twitter } from "lucide-react"
+import { db } from "@/lib/db"
 // import NewsletterForm from "@/components/newsletter-form"
 
-export default function Footer() {
+export default async function Footer() {
+  let supportEmail = "esprit.creativadeco@gmail.com"
+  let supportPhone = "05 52 79 66 95"
+  let supportAddress = "Dely Brahim rue ahmed Ouaked - devant la banque ABC - Alger"
+
+  try {
+    const settings = await db.query.siteSettings.findFirst()
+    supportEmail = settings?.supportEmail || supportEmail
+    supportPhone = settings?.phone || supportPhone
+    supportAddress = settings?.address || supportAddress
+  } catch (error) {
+    console.error("Footer settings fallback:", error)
+  }
+
   return (
     <footer className="bg-black text-white">
       <div className="container mx-auto px-4 py-12">
@@ -54,9 +68,9 @@ export default function Footer() {
           <div>
             <h3 className="mb-4 text-lg font-semibold">Contact</h3>
             <address className="not-italic">
-              <p className="mb-2 text-sm text-gray-300">Dely Brahim rue ahmed Ouaked - devant la banque ABC - Alger</p>
-              <p className="mb-2 text-sm text-gray-300">05 52 79 66 95</p>
-              <p className="text-sm text-gray-300">esprit.creativadeco@gmail.com</p>
+              <p className="mb-2 text-sm text-gray-300">{supportAddress}</p>
+              <p className="mb-2 text-sm text-gray-300">{supportPhone}</p>
+              <p className="text-sm text-gray-300">{supportEmail}</p>
             </address>
           </div>
           <div>
