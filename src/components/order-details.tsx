@@ -100,7 +100,7 @@ export default function OrderDetails({ order }: OrderDetailsProps) {
                         <div className="flex flex-1 flex-col">
                           <div className="flex justify-between">
                             <Link
-                              href={`/products/${item.product.id}`}
+                              href={`/products/${item.product.slug}`}
                               className="font-medium hover:underline"
                             >
                               {item.product.name}

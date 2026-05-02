@@ -123,7 +123,7 @@ export const createProduct = adminAction
       revalidatePath("/admin/products");
       revalidatePath("/");
       revalidatePath("/category/[slug]", "page");
-      revalidatePath("/products/[id]", "page");
+      revalidatePath(`/products/${slug}`);
 
       return { success: true, message: "Produit créé avec succès" };
     } catch (error) {
@@ -211,7 +211,7 @@ export const updateProduct = adminAction
         revalidatePath("/admin/products");
         revalidatePath("/");
         revalidatePath("/category/[slug]", "page");
-        revalidatePath(`/products/${id}`);
+        revalidatePath(`/products/${slug}`);
 
         return { success: true, message: "Produit mis à jour avec succès" };
       } catch (error) {

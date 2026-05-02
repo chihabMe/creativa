@@ -7,11 +7,11 @@ import Header from "@/components/header"
 import Footer from "@/components/footer"
 
 interface ProductPageProps {
-  params: {slug:string}
+  params: Promise<{ slug: string }>
 }
 
 export async function generateMetadata({ params }: ProductPageProps, parent: ResolvingMetadata): Promise<Metadata> {
-  const productSlug = params.slug
+  const { slug: productSlug } = await params
 
   const product = await getProductBySlug(productSlug)
 
@@ -70,8 +70,8 @@ export async function generateMetadata({ params }: ProductPageProps, parent: Res
   }
 }
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
-  const productSlug =  params.slug
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug: productSlug } = await params
 
   const product = await getProductBySlug(productSlug)
 

@@ -190,7 +190,7 @@ export default function ProductDetailsPage({
               label: product.categories?.[0] || "Produits",
               href: `/category/${product.categories?.[0] || ""}`,
             },
-            { label: product.name, href: `/products/${product.id}` },
+            { label: product.name, href: `/products/${product.slug}` },
           ]}
         />
 
